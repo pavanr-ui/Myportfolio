@@ -6,11 +6,10 @@
     <title>Pavan Ramshetty — Senior Frontend Developer | AI-Assisted Developer</title>
     <meta
       name="description"
-      content="Pavan Ramshetty is a Senior Frontend Developer with 8+ years in IT, building clean, responsive and accessible web experiences with Vue.js, Ionic and Quasar — and exploring AI-assisted development."
+      content="Pavan Ramshetty is a Senior Frontend Developer with 6+ years of experience, building clean, responsive and accessible web experiences with Vue.js, Ionic and Quasar — and exploring AI-assisted development."
     />
     <meta name="author" content="Pavan Ramshetty" />
-    <meta name="theme-color" content="#F8F7F4" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#101828" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0C0D10" />
     <meta name="color-scheme" content="light dark" />
 
     <meta property="og:type" content="profile" />
@@ -51,7 +50,7 @@
       ;(function () {
         try {
           var s = localStorage.getItem('theme')
-          var d = s ? s === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+          var d = s ? s === 'dark' : true // dark is the signature look; light stays one click away
           document.documentElement.classList.toggle('dark', d)
         } catch (e) {}
       })()

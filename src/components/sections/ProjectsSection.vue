@@ -128,7 +128,7 @@ useScrollReveal(root, (el) => {
           v-for="(p, i) in projects"
           :key="p.id"
           class="pj-slide shrink-0"
-          :style="horizontal ? { width: 'min(56vw, calc((100svh - 23rem) * 1.6))' } : null"
+          :style="horizontal ? { width: p.featured ? 'min(78vw, calc((100svh - 16rem) * 2.7))' : 'min(48vw, calc((100svh - 28rem) * 1.6))' } : null"
         >
           <ProjectCard :ref="(c) => (cards[i] = c)" :project="p" :total="projects.length" :stacked="!horizontal" @open="openProject" />
         </div>

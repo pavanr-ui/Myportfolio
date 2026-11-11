@@ -5,8 +5,21 @@ import SectionHeading from '../ui/SectionHeading.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { gsap } from '@/composables/motion'
 import { experience } from '@/data/content'
+import { site } from '@/config/site'
 
 const root = ref(null)
+
+// tenure, computed from the real start date in content data (e.g. "2 yrs 1 mo")
+function tenure(start) {
+  const [y, m] = start.split('-').map(Number)
+  const now = new Date()
+  let months = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m)
+  months = Math.max(0, months)
+  const yrs = Math.floor(months / 12)
+  const mo = months % 12
+  return [yrs && `${yrs} yr${yrs > 1 ? 's' : ''}`, mo && `${mo} mo`].filter(Boolean).join(' ') || 'Just started'
+}
+const today = new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 
 // Timeline spine draws as you scroll through the section
 useScrollReveal(root, (el) => {
@@ -80,6 +93,21 @@ useScrollReveal(root, (el) => {
 
             <p class="mt-6 max-w-2xl leading-relaxed text-muted">{{ job.summary }}</p>
 
+            <!-- milestones: start → today, with tenure -->
+            <div class="mt-8 rounded-2xl border border-line bg-subtle/60 p-5" data-reveal>
+              <div class="flex items-center justify-between font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-muted">
+                <span>Oct 2024 · Joined</span>
+                <span class="text-accent-ink">{{ tenure(job.start) }}</span>
+                <span>{{ today }} · Today</span>
+              </div>
+              <div class="relative mt-4 h-px bg-line">
+                <span class="absolute inset-y-0 left-0 w-full origin-left bg-accent" data-line aria-hidden="true" />
+                <span class="absolute -top-[5px] left-0 h-[11px] w-[11px] rounded-full border-2 border-accent bg-bg" aria-hidden="true" />
+                <span class="absolute -top-[5px] right-0 h-[11px] w-[11px] rounded-full bg-accent shadow-[0_0_0_5px_rgb(var(--c-accent)/0.2)]" aria-hidden="true" />
+              </div>
+              <p class="sr-only">Joined in October 2024, {{ tenure(job.start) }} in the role so far.</p>
+            </div>
+
             <ul class="mt-8 grid gap-x-8 gap-y-3 sm:grid-cols-2" data-stagger="0.06">
               <li v-for="h in job.highlights" :key="h" class="flex items-start gap-3 text-[0.9375rem]">
                 <Check class="mt-1 h-4 w-4 shrink-0 text-accent-ink" stroke-width="2" aria-hidden="true" />
@@ -101,7 +129,7 @@ useScrollReveal(root, (el) => {
           />
           <p class="label sm:pr-12 sm:text-right" data-reveal>Before 2024</p>
           <p class="text-muted sm:ml-12" data-reveal>
-            <span class="font-display text-2xl italic text-ink">8+ years in IT</span>
+            <span class="font-display text-2xl italic text-ink">{{ site.experienceYears }}+ years of experience overall</span>
             <span class="mt-1 block text-sm">The full career history is available in my résumé.</span>
           </p>
         </li>

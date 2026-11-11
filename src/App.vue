@@ -3,6 +3,8 @@ import { onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
 import CinematicIntro from './components/CinematicIntro.vue'
 import NavBar from './components/NavBar.vue'
 import SiteFooter from './components/SiteFooter.vue'
+import SectionProgress from './components/SectionProgress.vue'
+import DevExtras from './components/DevExtras.vue'
 import HeroSection from './components/sections/HeroSection.vue'
 import AboutSection from './components/sections/AboutSection.vue'
 import ExperienceSection from './components/sections/ExperienceSection.vue'
@@ -34,7 +36,9 @@ watch(
   <CinematicIntro />
   <component :is="CustomCursor" v-if="CustomCursor" />
   <NavBar />
-  <main id="main">
+  <SectionProgress />
+  <DevExtras />
+  <main id="main" tabindex="-1" class="focus:outline-none">
     <HeroSection />
     <AboutSection />
     <ExperienceSection />

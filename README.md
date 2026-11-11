@@ -22,7 +22,15 @@ npm run preview  # preview the production build
 | Email / LinkedIn / GitHub | `contact` in `src/config/site.js`. Empty values show "Coming soon" and never link anywhere. |
 | Contact form | Set `formEndpoint` (e.g. a Formspree URL) for real delivery. With only `email` set, the form opens the visitor's mail app. With neither, it runs in a clearly labelled **demo** mode. |
 | Projects | `src/data/content.js` — add `image`, `url`, `github` per project; buttons appear only for values that exist. |
-| Skills, experience, AI tools, philosophy | `src/data/content.js` |
+| Experience figure | `experienceYears` in `src/config/site.js` — used everywhere the site mentions years. |
+| Skills, experience, AI tools, AI journey, project contributions | `src/data/content.js` |
+
+## Interactions & extras
+
+- Keyboard: `1`–`7` jump to sections, `t` toggles theme, `?` shows all shortcuts.
+- Easter egg: type `vue` anywhere to toggle **Blueprint mode**, which outlines the page's section/component structure.
+- Section progress rail (desktop ≥ 1280px), gliding nav indicator, magnetic buttons with press ripples,
+  3D tilt cards with glare, a flip-able digital profile card, and a time-of-day greeting in the hero.
 
 ## Structure
 

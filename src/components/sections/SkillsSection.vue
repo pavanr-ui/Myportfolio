@@ -1,6 +1,7 @@
 <script setup>
 import { ref, defineAsyncComponent } from 'vue'
 import SectionHeading from '../ui/SectionHeading.vue'
+import SkillGlyph from '../SkillGlyph.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { skills, skillGroups } from '@/data/content'
 
@@ -12,6 +13,15 @@ const SkillsOrbit = showOrbit ? defineAsyncComponent(() => import('../SkillsOrbi
 const root = ref(null)
 const filter = ref('All')
 const matches = (s) => filter.value === 'All' || s.group === filter.value
+const count = (g) => (g === 'All' ? skills.length : skills.filter((s) => s.group === g).length)
+
+// soft spotlight that follows the pointer across a skill card
+function spot(e) {
+  const el = e.currentTarget
+  const r = el.getBoundingClientRect()
+  el.style.setProperty('--mx', `${e.clientX - r.left}px`)
+  el.style.setProperty('--my', `${e.clientY - r.top}px`)
+}
 
 useScrollReveal(root)
 </script>
@@ -44,7 +54,7 @@ useScrollReveal(root)
           :aria-pressed="filter === g"
           @click="filter = g"
         >
-          {{ g }}
+          {{ g }} <span class="ml-1 tabular-nums opacity-60">{{ count(g) }}</span>
         </button>
       </div>
 
@@ -55,12 +65,19 @@ useScrollReveal(root)
           class="group relative flex min-h-[15rem] flex-col justify-between overflow-hidden border-b border-r border-line p-7 transition-[opacity,background-color] duration-500"
           :class="matches(s) ? 'opacity-100 hover:bg-subtle' : 'opacity-30'"
           :aria-hidden="matches(s) ? undefined : 'true'"
+          @pointermove="spot"
         >
-          <div class="flex items-start justify-between">
+          <div
+            class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style="background: radial-gradient(16rem circle at var(--mx, 50%) var(--my, 50%), rgb(var(--c-accent) / 0.14), transparent 60%)"
+            aria-hidden="true"
+          />
+          <div class="relative flex items-start justify-between">
             <span class="font-display text-lg italic text-accent-ink">{{ String(i + 1).padStart(2, '0') }}</span>
             <span class="label text-[0.625rem]">{{ s.group }}</span>
           </div>
-          <div>
+          <SkillGlyph :name="s.name" class="relative mt-6 text-muted transition-colors duration-500 group-hover:text-accent-ink" />
+          <div class="relative">
             <h3
               class="display text-[2.75rem] transition-transform duration-700 ease-expo group-hover:-translate-y-1 sm:text-5xl"
             >

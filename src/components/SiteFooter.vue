@@ -1,10 +1,34 @@
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { ArrowUp } from 'lucide-vue-next'
 import { site } from '@/config/site'
 import { navItems } from '@/data/content'
 import { motion, setMotionPreference } from '@/composables/motion'
 
 const year = new Date().getFullYear()
+
+// back-to-top: ring shows page progress; smooth scroll unless reduced motion
+const progress = ref(0)
+let raf = 0
+const onScroll = () => {
+  if (raf) return
+  raf = requestAnimationFrame(() => {
+    raf = 0
+    const max = document.documentElement.scrollHeight - window.innerHeight
+    progress.value = max > 0 ? Math.min(1, window.scrollY / max) : 0
+  })
+}
+function toTop(e) {
+  e.preventDefault()
+  window.scrollTo({ top: 0, behavior: motion.reduced ? 'auto' : 'smooth' })
+  document.getElementById('main')?.focus({ preventScroll: true })
+}
+onMounted(() => {
+  onScroll()
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+const C = 2 * Math.PI * 20
 </script>
 
 <template>
@@ -27,18 +51,27 @@ const year = new Date().getFullYear()
           href="#home"
           class="group inline-flex items-center gap-3 self-start text-sm font-semibold md:self-auto"
           aria-label="Back to top"
+          data-cursor="Top"
+          @click="toTop"
         >
           Back to top
-          <span
-            class="grid h-11 w-11 place-items-center rounded-full border border-line transition-all duration-500 ease-expo group-hover:-translate-y-1 group-hover:border-ink group-hover:bg-ink group-hover:text-bg"
-          >
-            <ArrowUp class="h-4 w-4" aria-hidden="true" />
+          <span class="relative grid h-12 w-12 place-items-center transition-transform duration-500 ease-expo group-hover:-translate-y-1">
+            <svg viewBox="0 0 44 44" class="absolute inset-0 h-full w-full -rotate-90" aria-hidden="true">
+              <circle cx="22" cy="22" r="20" fill="none" stroke="rgb(var(--c-line))" stroke-width="1.5" />
+              <circle
+                cx="22" cy="22" r="20" fill="none" stroke="rgb(var(--c-accent))" stroke-width="1.5" stroke-linecap="round"
+                :stroke-dasharray="C" :stroke-dashoffset="C * (1 - progress)"
+              />
+            </svg>
+            <span class="grid h-9 w-9 place-items-center rounded-full transition-colors duration-500 group-hover:bg-ink group-hover:text-bg">
+              <ArrowUp class="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5" aria-hidden="true" />
+            </span>
           </span>
         </a>
       </div>
 
       <div class="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:justify-between">
-        <p>Designed &amp; Built by {{ site.name }}.</p>
+        <p>Designed &amp; Built by {{ site.name }}. <span class="hidden lg:inline">Press <kbd class="rounded border border-line px-1.5 font-mono">?</kbd> for shortcuts.</span></p>
         <!-- simplified animation mode (auto-enabled on low-powered devices) -->
         <p v-if="!motion.reduced">
           <button

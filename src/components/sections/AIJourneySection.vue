@@ -7,6 +7,7 @@ import { ScrollTrigger, motion } from '@/composables/motion'
 import { aiTools, aiPractices, aiWorkflow } from '@/data/content'
 
 const AIWorkspace = defineAsyncComponent(() => import('../AIWorkspace.vue'))
+const AITimeline = defineAsyncComponent(() => import('../AITimeline.vue'))
 
 const icons = { MessageSquareText, Sparkles, SquareTerminal, Code2 }
 const root = ref(null)
@@ -75,6 +76,10 @@ useScrollReveal(root, (el) => {
           </div>
         </li>
       </ul>
+
+      <div class="mt-24" data-reveal>
+        <AITimeline />
+      </div>
     </div>
 
     <!-- workflow story: sticky on desktop, scroll moves through the five steps -->

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { Mail, Linkedin, Github, ArrowUpRight, Send, Info, CheckCircle2 } from 'lucide-vue-next'
+import { Mail, Linkedin, Github, ArrowUpRight, Send, Info, CheckCircle2, Copy, Check } from 'lucide-vue-next'
 import BaseButton from '../ui/BaseButton.vue'
 import ResumeButton from '../ui/ResumeButton.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
@@ -15,6 +15,22 @@ const channels = [
   { label: 'LinkedIn', icon: Linkedin, href: linkedin, value: linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') },
   { label: 'GitHub', icon: Github, href: github, value: github.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') },
 ]
+
+// copy-email interaction with an announced confirmation
+const copied = ref(false)
+async function copyEmail() {
+  try {
+    await navigator.clipboard.writeText(email)
+  } catch {
+    const t = Object.assign(document.createElement('textarea'), { value: email })
+    document.body.appendChild(t)
+    t.select()
+    document.execCommand('copy')
+    t.remove()
+  }
+  copied.value = true
+  setTimeout(() => (copied.value = false), 2200)
+}
 
 /** endpoint → real submission · email only → opens mail app · neither → demo */
 const mode = computed(() => (site.formEndpoint ? 'live' : email ? 'mailto' : 'demo'))
@@ -81,10 +97,10 @@ const floatLabel =
     <div class="pointer-events-none absolute inset-0 select-none" aria-hidden="true">
       <div class="absolute inset-0 bg-grid mask-radial opacity-50" />
       <p class="display-caps text-outline absolute -left-[10%] top-[6%] whitespace-nowrap text-[clamp(7rem,18vw,17rem)]" data-parallax-x="0.35">
-        Let’s talk · Let’s talk · Let’s talk ·
+        Let’s build · Let’s build · Let’s build ·
       </p>
       <p class="display-caps text-outline absolute -right-[10%] bottom-[4%] whitespace-nowrap text-[clamp(7rem,18vw,17rem)]" data-parallax-x="-0.35">
-        Make it happen · Make it happen ·
+        Something meaningful · Something meaningful ·
       </p>
     </div>
 
@@ -95,8 +111,8 @@ const floatLabel =
         <span class="label">Contact</span>
       </div>
       <h2 id="contact-title" class="display-caps max-w-6xl text-[clamp(2.8rem,8vw,8rem)]" data-split="chars">
-        Have a project in mind?<br />
-        <em class="text-accent-ink">Let’s make it happen.</em>
+        Let’s Build Something<br />
+        <em class="text-accent-ink">Meaningful.</em>
       </h2>
       <p class="mb-16 mt-8 max-w-2xl text-pretty text-lg leading-relaxed text-muted lg:mb-24" data-reveal>
         I’m always interested in connecting with developers, teams, and opportunities to build meaningful digital
@@ -118,6 +134,25 @@ const floatLabel =
         </span>
         <ArrowUpRight class="h-8 w-8 shrink-0 transition-transform duration-700 ease-expo group-hover:rotate-45" aria-hidden="true" />
       </a>
+
+      <!-- primary CTAs (magnetic) — only for channels that really exist -->
+      <div class="mb-16 flex flex-wrap items-center gap-3 lg:mb-24" data-reveal>
+        <BaseButton v-if="email" :href="`mailto:${email}`" cursor="Write">
+          <Mail class="h-4 w-4" aria-hidden="true" /> Email me
+        </BaseButton>
+        <BaseButton v-if="email" variant="outline" :aria-label="copied ? 'Email address copied' : 'Copy email address'" @click="copyEmail">
+          <Check v-if="copied" class="h-4 w-4" aria-hidden="true" />
+          <Copy v-else class="h-4 w-4" aria-hidden="true" />
+          {{ copied ? 'Copied!' : 'Copy email' }}
+        </BaseButton>
+        <BaseButton v-if="linkedin" :href="linkedin" external :variant="email ? 'outline' : 'primary'" cursor="Open">
+          <Linkedin class="h-4 w-4" aria-hidden="true" /> Connect on LinkedIn
+        </BaseButton>
+        <BaseButton v-if="github" :href="github" external variant="outline" cursor="Open">
+          <Github class="h-4 w-4" aria-hidden="true" /> See my GitHub
+        </BaseButton>
+        <span class="sr-only" role="status" aria-live="polite">{{ copied ? 'Email address copied to clipboard' : '' }}</span>
+      </div>
 
       <div class="grid gap-16 lg:grid-cols-12 lg:gap-12">
         <!-- channels -->

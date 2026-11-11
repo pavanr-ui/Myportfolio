@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useMagneticHover } from '@/composables/useMagneticHover'
 import { useSound } from '@/composables/useSound'
+import { ripple } from '@/composables/useRipple'
 
 const props = defineProps({
   href: { type: String, default: '' },
@@ -46,6 +47,7 @@ const classes = computed(() => [
     :data-cursor="cursor || undefined"
     :class="classes"
     @click="play('click')"
+    @pointerdown="ripple"
   >
     <!-- sliding fill on hover -->
     <span

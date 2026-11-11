@@ -1,12 +1,18 @@
 <script setup>
 import { Sun, Moon } from 'lucide-vue-next'
 import { useTheme } from '@/composables/useTheme'
+import { ref } from 'vue'
+import { useMagneticHover } from '@/composables/useMagneticHover'
+
+const btn = ref(null)
+useMagneticHover(btn, { strength: 0.35 })
 
 const { isDark, toggle } = useTheme()
 </script>
 
 <template>
   <button
+    ref="btn"
     type="button"
     class="relative grid h-10 w-10 place-items-center overflow-hidden rounded-full border border-line text-ink transition-colors duration-300 hover:border-ink/40"
     :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"

@@ -85,6 +85,9 @@ export const aiWorkflow = [
 export const projects = [
   {
     id: 'vue-apps',
+    featured: true,
+    contribution:
+      'Developing and maintaining enterprise application interfaces in Vue.js — including account-related modules such as Account Progress and Account Resources — and translating Figma designs into reusable, consistent components.',
     index: '01',
     title: 'Vue.js Web Applications',
     description: 'Modern responsive interfaces, reusable components, and frontend functionality.',
@@ -99,6 +102,8 @@ export const projects = [
   },
   {
     id: 'ionic-quasar',
+    contribution:
+      'Building and enhancing reusable UI components and responsive application layouts with Ionic and Quasar, refining component behaviour and visual consistency.',
     index: '02',
     title: 'Ionic & Quasar Applications',
     description: 'Responsive application experiences and reusable UI components.',
@@ -113,6 +118,8 @@ export const projects = [
   },
   {
     id: 'dashboards',
+    contribution:
+      'Implementing dashboard enhancements such as responsive resizing and collapsible layout behaviour, plus skeleton loaders and clear loading states across modules.',
     index: '03',
     title: 'Interactive Dashboards',
     description: 'Data-driven dashboards, interactive UI elements, and responsive layouts.',
@@ -127,6 +134,8 @@ export const projects = [
   },
   {
     id: 'ai-assistant',
+    contribution:
+      'Frontend work on AI Assistant features at AlertDriving, with attention to semantic HTML, ARIA labels and accessible interactive controls.',
     index: '04',
     title: 'AI Assistant Features',
     description: 'Exploring AI-powered assistant experiences and AI-assisted frontend workflows.',
@@ -141,6 +150,8 @@ export const projects = [
   },
   {
     id: 'ai-journey',
+    contribution:
+      'Personal learning: practising prompt engineering and using ChatGPT, Claude, Claude Code and GitHub Copilot to draft and review code — always verifying the result myself. This portfolio was itself built with AI-assisted development.',
     index: '05',
     title: 'My AI Developer Journey',
     description: 'Learning and experimenting with AI-assisted development to improve frontend productivity.',
@@ -197,4 +208,33 @@ export const philosophy = [
   { title: 'Accessibility matters', text: 'Semantic markup, keyboard support and contrast are not optional extras.' },
   { title: 'Continuous learning', text: 'The web keeps moving — staying curious is part of the job.' },
   { title: 'AI-assisted productivity, human-verified', text: 'AI accelerates the work. Careful review keeps it correct.' },
+]
+
+/** AI developer journey — honest stages of learning and experimenting */
+export const aiJourney = [
+  {
+    title: 'Prompt engineering',
+    status: 'Learning',
+    text: 'Learning to frame problems with clear context, constraints and examples so AI output is actually useful.',
+  },
+  {
+    title: 'Claude Code experiments',
+    status: 'Experimenting',
+    text: 'Experimenting with agentic, in-editor workflows that read and change code across a whole project.',
+  },
+  {
+    title: 'Generating & reviewing code',
+    status: 'Practising',
+    text: 'Using ChatGPT, Claude and GitHub Copilot to draft code — then reviewing every line for correctness and accessibility.',
+  },
+  {
+    title: 'AI agents & automation',
+    status: 'Exploring',
+    text: 'Exploring how agents and automation could take repetitive development tasks off my plate.',
+  },
+  {
+    title: 'Practical AI-powered projects',
+    status: 'Next',
+    text: 'Moving toward small, practical AI-powered builds — starting with this portfolio, created with AI-assisted development.',
+  },
 ]

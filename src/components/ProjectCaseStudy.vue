@@ -117,6 +117,10 @@ onBeforeUnmount(() => {
         <div class="lg:col-span-6" data-pt>
           <p class="label mb-4">Overview</p>
           <p class="text-lg leading-relaxed">{{ shown.details }}</p>
+          <div v-if="shown.contribution" class="mt-8 border-l-2 border-warm pl-5">
+            <p class="label mb-2 text-warm">My contribution</p>
+            <p class="leading-relaxed text-muted">{{ shown.contribution }}</p>
+          </div>
           <div class="mt-8 flex flex-wrap gap-3">
             <a
               v-if="shown.url"

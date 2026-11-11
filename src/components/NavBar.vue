@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { Menu, X } from 'lucide-vue-next'
 import ThemeToggle from './ui/ThemeToggle.vue'
 import SoundToggle from './ui/SoundToggle.vue'
@@ -12,6 +12,18 @@ const scrolled = ref(false)
 const progress = ref(0)
 const active = ref('home')
 const open = ref(false)
+
+// one indicator that glides between links (follows hover, settles on the active section)
+const linkList = ref(null)
+const hovered = ref(null)
+const indicator = ref({ x: 0, w: 0, show: false })
+function placeIndicator() {
+  const id = hovered.value || active.value
+  const a = linkList.value?.querySelector(`a[href="#${id}"]`)
+  if (!a) return (indicator.value.show = false)
+  indicator.value = { x: a.offsetLeft + 12, w: a.offsetWidth - 24, show: true }
+}
+watch([active, hovered], () => nextTick(placeIndicator))
 
 let raf = 0
 let sections = []
@@ -63,12 +75,16 @@ onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('resize', onScroll, { passive: true })
   window.addEventListener('keydown', onKey)
+  window.addEventListener('resize', placeIndicator, { passive: true })
+  document.fonts?.ready.then(placeIndicator)
+  placeIndicator()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', onScroll)
   window.removeEventListener('keydown', onKey)
+  window.removeEventListener('resize', placeIndicator)
 })
 </script>
 
@@ -94,22 +110,27 @@ onBeforeUnmount(() => {
         <span class="hidden text-sm font-semibold tracking-wide sm:inline">{{ site.name }}</span>
       </a>
 
-      <ul class="hidden items-center gap-1 lg:flex">
+      <ul ref="linkList" class="relative hidden items-center gap-1 lg:flex" @mouseleave="hovered = null">
         <li v-for="item in navItems" :key="item.id">
           <a
             :href="`#${item.id}`"
             class="relative block px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-300"
-            :class="active === item.id ? 'text-ink' : 'text-muted hover:text-ink'"
+            :class="active === item.id || hovered === item.id ? 'text-ink' : 'text-muted'"
             :aria-current="active === item.id ? 'true' : undefined"
+            @mouseenter="hovered = item.id"
+            @focus="hovered = item.id"
+            @blur="hovered = null"
           >
             {{ item.label }}
-            <span
-              class="absolute inset-x-3 -bottom-0.5 h-px origin-left bg-ink transition-transform duration-500 ease-expo"
-              :class="active === item.id ? 'scale-x-100' : 'scale-x-0'"
-              aria-hidden="true"
-            />
           </a>
         </li>
+        <!-- gliding indicator -->
+        <span
+          class="pointer-events-none absolute -bottom-0.5 left-0 h-px bg-ink transition-[transform,width,opacity] duration-500 ease-expo"
+          :class="hovered && hovered !== active ? 'opacity-50' : 'opacity-100'"
+          :style="{ width: indicator.w + 'px', transform: `translateX(${indicator.x}px)`, opacity: indicator.show ? undefined : 0 }"
+          aria-hidden="true"
+        />
       </ul>
 
       <div class="flex items-center gap-2 sm:gap-3">

@@ -14,38 +14,47 @@
     --c-muted: 92 99 112;       /* AA on paper */
     --c-accent: 128 149 181;    /* #8095B5 — decorative */
     --c-accent-ink: 79 98 128;  /* darker steel for accent text (AA) */
+    --c-warm: 128 92 48;        /* champagne (deepened for AA on paper), used sparingly */
     --nav-h: 4.5rem;
     color-scheme: light;
   }
 
   .dark {
-    /* Dark — deep navy, off-white ink */
-    --c-bg: 16 24 40;           /* #101828 */
-    --c-surface: 22 32 52;
-    --c-subtle: 20 29 47;
-    --c-line: 44 55 77;
-    --c-ink: 240 239 235;
-    --c-muted: 160 170 188;
-    --c-accent: 128 149 181;
-    --c-accent-ink: 156 175 204;
+    /* Dark (default) — deep charcoal, warm white ink, muted steel + champagne accents */
+    --c-bg: 12 13 16;           /* #0C0D10 */
+    --c-surface: 22 24 29;
+    --c-subtle: 17 18 22;
+    --c-line: 42 45 52;
+    --c-ink: 240 236 228;       /* warm white #F0ECE4 */
+    --c-muted: 158 160 168;
+    --c-accent: 128 149 181;    /* #8095B5 */
+    --c-accent-ink: 160 178 206;
+    --c-warm: 201 169 122;      /* #C9A97A */
     color-scheme: dark;
   }
 
   /* A permanently dark band (used by the AI section) — deeper still in dark mode */
   .dark-scope {
-    --c-bg: 16 24 40;
-    --c-surface: 26 37 59;
-    --c-subtle: 22 32 52;
-    --c-line: 48 60 84;
-    --c-ink: 240 239 235;
-    --c-muted: 164 174 192;
+    --c-bg: 16 18 22;
+    --c-surface: 26 28 34;
+    --c-subtle: 21 23 28;
+    --c-line: 46 49 57;
+    --c-ink: 240 236 228;
+    --c-muted: 162 164 172;
     --c-accent: 128 149 181;
-    --c-accent-ink: 160 179 208;
+    --c-accent-ink: 162 180 208;
+    --c-warm: 201 169 122;
     color-scheme: dark;
   }
   .dark .dark-scope {
-    --c-bg: 11 18 32;
-    --c-surface: 20 30 49;
+    --c-bg: 7 8 10;
+    --c-surface: 18 20 24;
+  }
+
+  html,
+  body {
+    /* clip (not hidden) prevents sideways scroll without breaking position: sticky */
+    overflow-x: clip;
   }
 
   html {
@@ -197,4 +206,43 @@ html.has-cursor [contenteditable] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Press ripple (src/composables/useRipple.js) */
+.ripple-dot {
+  position: absolute;
+  z-index: 5;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: currentColor;
+  opacity: 0.18;
+  transform: scale(0);
+  animation: ripple 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes ripple {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Easter egg: Blueprint mode (type "vue") — reveals the component/section structure */
+html.blueprint main *:not(svg, svg *) {
+  outline: 1px dashed rgb(var(--c-accent) / 0.35);
+  outline-offset: -1px;
+}
+html.blueprint main section[id] {
+  outline: 1px solid rgb(var(--c-warm) / 0.7) !important;
+}
+html.blueprint main section[id]::before {
+  content: '<section id="' attr(id) '">';
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  z-index: 60;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgb(var(--c-warm));
+  color: #14120f;
+  font: 600 10px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
 }

@@ -138,7 +138,7 @@ onBeforeUnmount(() => cleanup?.())
             <textPath href="#ring-path">{{ ring }}</textPath>
           </text>
         </svg>
-        <span class="font-display text-2xl italic text-accent-ink">8+</span>
+        <span class="font-display text-2xl italic text-accent-ink">{{ site.experienceYears }}+</span>
       </div>
     </div>
 

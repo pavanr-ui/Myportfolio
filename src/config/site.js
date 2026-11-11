@@ -13,7 +13,9 @@ export const site = {
   initials: 'PR',
   title: 'Senior Frontend Developer',
   subtitle: 'AI-Assisted Developer',
-  experience: '8+ years in IT',
+  /** Single source of truth for the experience figure shown across the site. */
+  experienceYears: 6,
+  experience: '6+ years of experience',
 
   /**
    * Availability badge in the hero. This is a static, editable statement — not a live status.

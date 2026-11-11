@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import AboutVisual from '../AboutVisual.vue'
+import ProfileCard from '../ProfileCard.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { gsap, SplitText } from '@/composables/motion'
 import { aboutBlocks } from '@/data/content'
+import { site } from '@/config/site'
 
 const root = ref(null)
 
@@ -60,14 +62,11 @@ useScrollReveal(root, (el) => {
       <!-- journey -->
       <div class="mt-20 grid gap-12 lg:mt-10 lg:grid-cols-12 lg:gap-10">
         <div class="lg:col-span-4" data-reveal>
-          <p class="font-display text-[clamp(5rem,10vw,8.5rem)] leading-none">
-            <span data-count="8">8</span><span class="text-accent">+</span>
-          </p>
-          <p class="label mt-3">Years in IT</p>
+          <ProfileCard />
         </div>
-        <div class="space-y-6 text-[1.0625rem] leading-relaxed text-muted lg:col-span-7 lg:col-start-6" data-stagger="0.12">
+        <div class="space-y-6 self-center text-[1.0625rem] leading-relaxed text-muted lg:col-span-7 lg:col-start-6" data-stagger="0.12">
           <p>
-            With <strong class="font-semibold text-ink">8+ years in IT</strong>, I now work as a
+            With <strong class="font-semibold text-ink">{{ site.experienceYears }}+ years of experience</strong>, I now work as a
             <strong class="font-semibold text-ink">Frontend Developer at AlertDriving</strong> — building Vue.js,
             Ionic and Quasar applications, interactive dashboards, reusable UI components, responsive interfaces,
             accessibility improvements and AI Assistant features.

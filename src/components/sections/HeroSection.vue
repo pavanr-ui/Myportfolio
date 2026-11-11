@@ -7,13 +7,15 @@ import ProfilePortrait from '../ProfilePortrait.vue'
 import { gsap, SplitText, appState, motion, fontsReady } from '@/composables/motion'
 import { site } from '@/config/site'
 import { experience } from '@/data/content'
+import { useGreeting } from '@/composables/useGreeting'
 
 // heavy-ish visual, only fetched for full-motion visitors
 const HeroParticles = motion.full ? defineAsyncComponent(() => import('../HeroParticles.vue')) : null
 
 const root = ref(null)
-const years = ref('8')
+const years = ref(String(site.experienceYears))
 const current = experience[0]
+const greeting = useGreeting()
 let ctx
 let intro
 let alive = true
@@ -45,11 +47,13 @@ function setup(el) {
     .to(q('.portrait-img'), { scale: 1.12, duration: 2.4 }, 0.6)
     .to(chars ? name.chars : name.lines, { yPercent: 0, rotate: 0, stagger: chars ? 0.035 : 0.12 }, 0.2)
     .to(q('.hero-fade'), { autoAlpha: 1, y: 0, stagger: 0.07 }, 0.5)
-    .to(counter, { v: 8, duration: 1.6, ease: 'power3.out', onUpdate: () => (years.value = String(Math.round(counter.v))) }, 0.9)
+    .to(counter, { v: site.experienceYears, duration: 1.6, ease: 'power3.out', onUpdate: () => (years.value = String(Math.round(counter.v))) }, 0.9)
     .to(q('.portrait-outline'), { autoAlpha: 1, duration: 1.2 }, 1.2)
     .to(q('.portrait-badge'), { autoAlpha: 1, duration: 1 }, 1.35)
     .fromTo(q('.portrait-label'), { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 1 }, 1.4)
     .to(q('.hero-deco, .scroll-cue'), { autoAlpha: 1, stagger: 0.06, duration: 1.2 }, 1.5)
+    .call(() => (typeReady = true))
+  let typeReady = false
 
   // gentle floating for decorative marks and technical labels
   if (motion.full) {
@@ -71,6 +75,27 @@ function setup(el) {
       x: gsap.quickTo(l, 'x', { duration: 1.4, ease: 'power3.out' }),
       y: gsap.quickTo(l, 'y', { duration: 1.4, ease: 'power3.out' }),
     }))
+    // interactive typography: letters of the name lift and lean toward the pointer
+    const letters = chars
+      ? name.chars.map((c) => ({
+          el: c,
+          y: gsap.quickTo(c, 'y', { duration: 0.6, ease: 'power3.out' }),
+          r: gsap.quickTo(c, 'rotation', { duration: 0.6, ease: 'power3.out' }),
+        }))
+      : []
+    let raf = 0
+    const shapeType = (e) => {
+      raf = 0
+      if (!typeReady) return
+      letters.forEach((l) => {
+        const b = l.el.getBoundingClientRect()
+        const dx = e.clientX - (b.left + b.width / 2)
+        const dy = e.clientY - (b.top + b.height / 2)
+        const f = Math.max(0, 1 - Math.hypot(dx, dy) / 220)
+        l.y(-f * 16)
+        l.r(f * (dx > 0 ? -4 : 4))
+      })
+    }
     const move = (e) => {
       const nx = e.clientX / innerWidth - 0.5
       const ny = e.clientY / innerHeight - 0.5
@@ -78,6 +103,7 @@ function setup(el) {
         l.x(nx * l.d)
         l.y(ny * l.d)
       })
+      if (!raf && letters.length) raf = requestAnimationFrame(() => shapeType(e))
     }
     el.addEventListener('pointermove', move, { passive: true })
     return () => el.removeEventListener('pointermove', move)
@@ -136,8 +162,10 @@ onBeforeUnmount(() => {
           {{ site.availability.label }}
         </p>
 
-        <p class="hero-fade label mb-5 flex items-center gap-3">
+        <p class="hero-fade label mb-5 flex flex-wrap items-center gap-3">
           <span class="h-px w-8 bg-accent" aria-hidden="true" />
+          <span class="text-warm">{{ greeting.text }}</span>
+          <span class="text-line" aria-hidden="true">·</span>
           The digital identity of
         </p>
 
@@ -176,7 +204,7 @@ onBeforeUnmount(() => {
           <div>
             <dt class="label">Experience</dt>
             <dd class="mt-2 font-display text-3xl">
-              <span class="tabular-nums">{{ years }}</span>+ <span class="font-sans text-base text-muted">years in IT</span>
+              <span class="tabular-nums">{{ years }}</span>+ <span class="font-sans text-base text-muted">years of experience</span>
             </dd>
           </div>
           <div>
