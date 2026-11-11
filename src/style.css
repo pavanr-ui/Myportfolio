@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ───────────────────────────────────────── */
+@layer base {
+  :root {
+    /* Light — warm off-white paper, graphite ink, muted steel accent */
+    --c-bg: 248 247 244;        /* #F8F7F4 */
+    --c-surface: 255 255 255;
+    --c-subtle: 239 238 234;    /* between paper and mist */
+    --c-line: 222 221 216;      /* ~#E7E7E4, a touch deeper for visible hairlines */
+    --c-ink: 32 36 44;          /* #20242C */
+    --c-muted: 92 99 112;       /* AA on paper */
+    --c-accent: 128 149 181;    /* #8095B5 — decorative */
+    --c-accent-ink: 79 98 128;  /* darker steel for accent text (AA) */
+    --nav-h: 4.5rem;
+    color-scheme: light;
+  }
+
+  .dark {
+    /* Dark — deep navy, off-white ink */
+    --c-bg: 16 24 40;           /* #101828 */
+    --c-surface: 22 32 52;
+    --c-subtle: 20 29 47;
+    --c-line: 44 55 77;
+    --c-ink: 240 239 235;
+    --c-muted: 160 170 188;
+    --c-accent: 128 149 181;
+    --c-accent-ink: 156 175 204;
+    color-scheme: dark;
+  }
+
+  /* A permanently dark band (used by the AI section) — deeper still in dark mode */
+  .dark-scope {
+    --c-bg: 16 24 40;
+    --c-surface: 26 37 59;
+    --c-subtle: 22 32 52;
+    --c-line: 48 60 84;
+    --c-ink: 240 239 235;
+    --c-muted: 164 174 192;
+    --c-accent: 128 149 181;
+    --c-accent-ink: 160 179 208;
+    color-scheme: dark;
+  }
+  .dark .dark-scope {
+    --c-bg: 11 18 32;
+    --c-surface: 20 30 49;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  body {
+    @apply bg-bg font-sans text-ink;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+
+  ::selection {
+    background: rgb(var(--c-accent) / 0.3);
+    color: rgb(var(--c-ink));
+  }
+
+  section[id] { scroll-margin-top: calc(var(--nav-h) - 1px); }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-accent));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Smooth theme switch for browsers without View Transitions */
+  html.theme-fade *,
+  html.theme-fade *::before,
+  html.theme-fade *::after {
+    transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, fill 0.5s ease,
+      stroke 0.5s ease !important;
+  }
+
+  /* View-transition circular reveal for theme switch */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+}
+
+/* ── Reusable primitives ─────────────────────────────────── */
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-site px-6 sm:px-8 lg:px-12;
+  }
+
+  .label {
+    @apply text-[0.6875rem] font-semibold uppercase tracking-label text-muted;
+  }
+
+  .display {
+    @apply font-display font-normal leading-[0.95] tracking-[-0.01em];
+  }
+
+  .hairline { @apply border-line; }
+
+  .section {
+    @apply relative py-24 sm:py-28 lg:py-36;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded-full border border-line px-3 py-1 text-xs font-medium text-muted transition-colors duration-300;
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible { background-size: 100% 1px; }
+}
+
+/* ── Cinematic layer ─────────────────────────────────────── */
+
+/* Fine architectural grid used by the intro, hero and contact */
+.bg-grid {
+  background-image: linear-gradient(rgb(var(--c-ink) / 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--c-ink) / 0.055) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: center center;
+}
+.mask-radial {
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 75%);
+}
+
+/* Uppercase editorial display type */
+.display-caps {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: -0.012em;
+}
+
+/* Outlined background typography */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(var(--c-ink) / 0.14);
+}
+
+/* Custom cursor: hide the native one only where the custom cursor is shown */
+/* (.cursor-native is set while a native modal is open — the top layer sits above the custom cursor) */
+html.has-cursor:not(.cursor-native),
+html.has-cursor:not(.cursor-native) * {
+  cursor: none !important;
+}
+html.has-cursor input,
+html.has-cursor textarea,
+html.has-cursor select,
+html.has-cursor [contenteditable] {
+  cursor: text !important;
+}
+
+/* Lite / reduced motion: switch off decorative CSS loops */
+.motion-reduced .css-loop,
+.motion-lite .css-loop {
+  animation: none !important;
+}
+
+/* SplitText line masks: give descenders (y, g, p) and italic overhang room inside the clip */
+[data-split] > div,
+.hero-name > div {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+  padding-right: 0.08em;
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
