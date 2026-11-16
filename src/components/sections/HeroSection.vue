@@ -12,6 +12,7 @@ import { useGreeting } from '@/composables/useGreeting'
 const root = ref(null)
 const avatar = ref(null)
 const hasVideo = !!site.avatarVideo?.src
+const watching = ref(false) // while the intro plays with sound, the copy steps back on small screens
 function watchIntro() {
   if (avatar.value) avatar.value.watchIntro()
   else document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
@@ -37,7 +38,7 @@ function setup(el) {
   // hidden start states — the intro curtain (or nothing yet painted) covers these
   gsap.set(chars ? name.chars : name.lines, { yPercent: 115, rotate: chars ? 8 : 0 })
   gsap.set(q('.hero-fade'), { autoAlpha: 0, y: 24 })
-  gsap.set(q('.hero-visual'), { clipPath: 'inset(0% 0% 0% 100% round 28px)', scale: 0.96, autoAlpha: 1 })
+  gsap.set(q('.hero-visual'), { autoAlpha: 0, scale: 1.08 })
   gsap.set(q('.scroll-cue'), { autoAlpha: 0 })
   // photo-portrait fallback (when no avatar video is configured)
   gsap.set(q('.portrait-slat'), { yPercent: 0, autoAlpha: 1 })
@@ -46,7 +47,7 @@ function setup(el) {
   intro = gsap
     .timeline({ paused: true, defaults: { ease: 'expo.out', duration: 1.3 } })
     .to(q('.hero-bg'), { autoAlpha: 1, duration: 1.6 }, 0)
-    .to(q('.hero-visual'), { clipPath: 'inset(0% 0% 0% 0% round 28px)', scale: 1, duration: 1.6, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.15)
+    .to(q('.hero-visual'), { autoAlpha: 1, scale: 1, duration: 2.2, ease: 'power3.out' }, 0)
     .to(q('.portrait-slat'), { yPercent: 101, duration: 1.2, ease: 'expo.inOut', stagger: { each: 0.08, from: 'center' } }, 0.75)
     .to(chars ? name.chars : name.lines, { yPercent: 0, rotate: 0, stagger: chars ? 0.035 : 0.12 }, 0.2)
     .to(q('.hero-fade'), { autoAlpha: 1, y: 0, stagger: 0.07 }, 0.5)
@@ -59,7 +60,7 @@ function setup(el) {
 
   // scroll: the avatar recedes slightly, background layers move at different speeds, copy lifts away
   const st = { trigger: el, start: 'top top', end: 'bottom top', scrub: true }
-  gsap.to(q('.hero-visual-wrap'), { y: 60, scale: 0.94, ease: 'none', scrollTrigger: st })
+  gsap.to(q('.hero-visual-wrap'), { yPercent: 14, ease: 'none', scrollTrigger: st })
   gsap.to(q('.hero-grid'), { yPercent: 18, ease: 'none', scrollTrigger: st })
   gsap.to(q('.hero-copy'), { y: -70, autoAlpha: 0.2, ease: 'none', scrollTrigger: { ...st, start: 'center center' } })
 
@@ -129,20 +130,49 @@ onBeforeUnmount(() => {
   <section
     id="home"
     ref="root"
-    class="relative flex min-h-[100svh] items-center overflow-hidden pb-24 pt-[calc(var(--nav-h)+2.5rem)] lg:pb-20"
+    class="dark-scope relative isolate flex min-h-[100svh] items-end overflow-hidden bg-abyss pb-16 pt-[calc(var(--nav-h)+36svh)] text-ink sm:pb-20 md:pt-[calc(var(--nav-h)+40svh)] lg:items-center lg:pb-16 lg:pt-[calc(var(--nav-h)+2rem)]"
     aria-labelledby="hero-title"
   >
-    <!-- background layers -->
-    <div class="hero-bg pointer-events-none absolute inset-0" :class="motion.animate ? 'invisible opacity-0' : ''" aria-hidden="true">
-      <div class="hero-grid bg-grid mask-radial absolute -inset-y-24 inset-x-0 opacity-70" />
+    <!-- full-bleed avatar video (or the photo portrait when no video is configured) -->
+    <div class="hero-visual-wrap absolute inset-x-0 top-0 -z-20 h-[100svh] lg:bottom-0 lg:h-auto">
+      <div class="hero-visual absolute inset-0" :class="motion.animate ? 'invisible' : ''">
+        <AvatarVideo v-if="hasVideo" ref="avatar" variant="background" @mode="(m) => (watching = m === 'watching')" />
+        <div v-else class="container-site flex h-full items-center justify-end">
+          <div class="hidden w-[min(26rem,40vw)] lg:block"><ProfilePortrait /></div>
+        </div>
+      </div>
     </div>
 
-    <div class="container-site relative grid items-center gap-16 lg:grid-cols-12 lg:gap-10">
-      <!-- copy -->
-      <div class="hero-copy lg:col-span-6">
+    <!-- readability: dark gradients (from the copy side, the top for the nav, the bottom into the page) -->
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="absolute inset-0 bg-gradient-to-t from-abyss via-abyss/80 via-55% to-transparent lg:hidden" />
+      <div class="absolute inset-0 hidden bg-gradient-to-r from-abyss/95 via-abyss/70 via-45% to-transparent lg:block" />
+      <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-abyss/70 to-transparent" />
+      <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-abyss to-transparent" />
+      <!-- blue / purple ambient light -->
+      <div
+        class="absolute inset-0 mix-blend-screen"
+        style="
+          background: radial-gradient(42rem 30rem at 82% 18%, rgb(var(--c-cyan) / 0.16), transparent 65%),
+            radial-gradient(40rem 30rem at 8% 92%, rgb(var(--c-warm) / 0.2), transparent 65%);
+        "
+      />
+    </div>
+
+    <!-- subtle futuristic grid over the video -->
+    <div class="hero-bg pointer-events-none absolute inset-0 -z-[5]" :class="motion.animate ? 'invisible opacity-0' : ''" aria-hidden="true">
+      <div class="hero-grid bg-grid mask-radial absolute -inset-y-24 inset-x-0 opacity-30" />
+    </div>
+
+    <div class="container-site relative" :class="watching ? 'max-lg:pointer-events-none' : ''">
+      <!-- copy, over the video -->
+      <div
+        class="hero-copy max-w-2xl transition-opacity duration-700 lg:max-w-[46%]"
+        :class="watching ? 'max-lg:opacity-25' : ''"
+      >
         <p
           v-if="site.availability?.show"
-          class="hero-fade mb-8 inline-flex items-center gap-2.5 rounded-full border border-line bg-bg/70 py-1.5 pl-3 pr-4 text-xs font-medium backdrop-blur"
+          class="hero-fade mb-6 inline-flex items-center gap-2.5 rounded-full border border-line bg-bg/70 py-1.5 pl-3 pr-4 text-xs font-medium backdrop-blur"
         >
           <span class="relative flex h-2 w-2" aria-hidden="true">
             <span class="css-loop absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500/60" />
@@ -158,12 +188,12 @@ onBeforeUnmount(() => {
           The digital identity of
         </p>
 
-        <h1 id="hero-title" class="hero-name display-caps text-[clamp(3rem,7vw,7rem)]">
+        <h1 id="hero-title" class="hero-name display-caps text-[clamp(2.9rem,6vw,6.25rem)] [text-shadow:0_2px_30px_rgb(0_0_0/0.45)]">
           Pavan<br />
           <em class="text-accent-ink [text-shadow:0_0_36px_rgb(var(--c-accent)/0.45)]">Ramshetty</em>
         </h1>
 
-        <p class="hero-fade mt-8 text-lg font-semibold tracking-tight sm:text-xl">
+        <p class="hero-fade mt-6 text-lg font-semibold tracking-tight sm:text-xl">
           {{ site.title }}
           <span class="mx-2 font-normal text-line" aria-hidden="true">/</span>
           <span class="font-medium text-muted">{{ site.subtitle }}</span>
@@ -172,12 +202,12 @@ onBeforeUnmount(() => {
           Building Digital Experiences with Frontend Engineering and AI.
         </p>
 
-        <p class="hero-fade mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-[1.0625rem]">
+        <p class="hero-fade mt-5 max-w-xl text-pretty text-base leading-relaxed text-ink/75 sm:text-[1.0625rem]">
           I build clean, responsive, accessible, and user-focused web experiences. Combining frontend engineering
           with AI-assisted development to create better digital products.
         </p>
 
-        <div class="hero-fade mt-10 flex flex-wrap items-center gap-3">
+        <div class="hero-fade mt-8 flex flex-wrap items-center gap-3">
           <BaseButton v-if="hasVideo" cursor="Watch" @click="watchIntro">
             <Play class="h-4 w-4" fill="currentColor" aria-hidden="true" />
             Watch My Intro
@@ -192,7 +222,7 @@ onBeforeUnmount(() => {
           </BaseButton>
         </div>
 
-        <dl class="hero-fade mt-12 grid max-w-lg grid-cols-2 gap-6 border-t border-line pt-6">
+        <dl class="hero-fade mt-10 grid max-w-lg grid-cols-2 gap-6 border-t border-white/15 pt-5">
           <div>
             <dt class="label">Experience</dt>
             <dd class="mt-2 font-display text-3xl">
@@ -207,14 +237,6 @@ onBeforeUnmount(() => {
             </dd>
           </div>
         </dl>
-      </div>
-
-      <!-- avatar video (or the photo portrait when no video is configured) -->
-      <div class="hero-visual-wrap lg:col-span-6 lg:pl-4">
-        <div class="hero-visual" :class="motion.animate ? 'invisible' : ''">
-          <AvatarVideo v-if="hasVideo" ref="avatar" />
-          <ProfilePortrait v-else />
-        </div>
       </div>
     </div>
 

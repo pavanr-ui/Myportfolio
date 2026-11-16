@@ -13,6 +13,12 @@ import { motion, appState } from '@/composables/motion'
 import { useSound } from '@/composables/useSound'
 import { site } from '@/config/site'
 
+const props = defineProps({
+  /** 'frame' = 16:9 card (default) · 'background' = full-bleed cover behind the hero content */
+  variant: { type: String, default: 'frame' },
+})
+const bg = props.variant === 'background'
+const emit = defineEmits(['mode'])
 const cfg = site.avatarVideo
 const root = ref(null)
 const video = ref(null)
@@ -23,7 +29,9 @@ const captionsOn = ref(true)
 const progress = ref(0)
 const duration = ref(0)
 const inView = ref(false)
+const cueText = ref('') // background mode renders captions inside the control bar (never over the hero copy)
 const { play: sound } = useSound()
+watch(mode, (m) => emit('mode', m))
 
 const saveData = typeof navigator !== 'undefined' && navigator.connection?.saveData
 const ambientAllowed = motion.full && !saveData
@@ -32,7 +40,13 @@ const timeLabel = computed(() => `${fmt(progress.value * duration.value)} / ${fm
 
 function setCaptions(on) {
   const track = video.value?.textTracks?.[0]
-  if (track) track.mode = on ? 'showing' : 'hidden'
+  if (!track) return
+  // 'hidden' still fires cuechange, so background mode can draw the text itself
+  track.mode = on && !bg ? 'showing' : 'hidden'
+  if (bg) {
+    track.oncuechange = on ? () => (cueText.value = track.activeCues?.[0]?.text?.replace(/\s*\n\s*/g, ' ') || '') : null
+    if (!on) cueText.value = ''
+  }
 }
 
 async function safePlay() {
@@ -63,7 +77,7 @@ async function watchIntro() {
   muted.value = false
   v.currentTime = 0
   setCaptions(captionsOn.value)
-  if (root.value) {
+  if (root.value && !bg) {
     const r = root.value.getBoundingClientRect()
     if (r.top < 0 || r.bottom > window.innerHeight) {
       root.value.scrollIntoView({ behavior: motion.reduced ? 'auto' : 'smooth', block: 'center' })
@@ -150,16 +164,30 @@ defineExpose({ watchIntro })
 </script>
 
 <template>
-  <figure ref="root" class="avatar-frame relative isolate mx-auto w-full" :class="mode === 'watching' ? 'is-watching' : ''">
-    <!-- soft blue/purple glow around the avatar -->
-    <div class="avatar-glow pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] opacity-80 blur-2xl" aria-hidden="true" />
-    <div class="avatar-ring css-loop pointer-events-none absolute -inset-px rounded-[1.7rem]" aria-hidden="true" />
+  <figure
+    ref="root"
+    :class="[
+      bg ? 'avatar-bg absolute inset-0 m-0' : 'avatar-frame relative isolate mx-auto w-full',
+      mode === 'watching' ? 'is-watching' : '',
+    ]"
+  >
+    <template v-if="!bg">
+      <!-- soft blue/purple glow around the avatar -->
+      <div class="avatar-glow pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] opacity-80 blur-2xl" aria-hidden="true" />
+      <div class="avatar-ring css-loop pointer-events-none absolute -inset-px rounded-[1.7rem]" aria-hidden="true" />
+    </template>
 
-    <div class="relative overflow-hidden rounded-[1.6rem] bg-abyss shadow-[0_40px_120px_-40px_rgb(var(--c-accent)/0.55)]">
+    <div
+      :class="
+        bg
+          ? 'absolute inset-0 overflow-hidden bg-abyss'
+          : 'relative overflow-hidden rounded-[1.6rem] bg-abyss shadow-[0_40px_120px_-40px_rgb(var(--c-accent)/0.55)]'
+      "
+    >
       <!-- 16:9 box matching the video → the avatar is never cropped, and there is no layout shift -->
       <video
         ref="video"
-        class="block aspect-video h-auto w-full object-cover"
+        :class="bg ? 'avatar-cover absolute inset-0 h-full w-full object-cover' : 'block aspect-video h-auto w-full object-cover'"
         :width="cfg.width"
         :height="cfg.height"
         :poster="cfg.poster"
@@ -180,13 +208,21 @@ defineExpose({ watchIntro })
       </video>
 
       <!-- label: honest about what this is -->
-      <span class="absolute left-2.5 top-2.5 rounded-full bg-black/45 px-2 py-0.5 font-mono text-[0.5rem] uppercase tracking-[0.14em] text-white/80 backdrop-blur sm:left-4 sm:top-4 sm:px-3 sm:py-1 sm:text-[0.625rem]">
+      <span
+        v-show="!(bg && mode === 'watching')"
+        class="absolute z-20 rounded-full bg-black/45 font-mono uppercase text-white/80 backdrop-blur"
+        :class="
+          bg
+            ? 'right-4 top-[calc(var(--nav-h)+0.75rem)] px-3 py-1 text-[0.5625rem] tracking-[0.16em] sm:right-6 sm:text-[0.625rem] lg:bottom-8 lg:right-8 lg:top-auto'
+            : 'left-2.5 top-2.5 px-2 py-0.5 text-[0.5rem] tracking-[0.14em] sm:left-4 sm:top-4 sm:px-3 sm:py-1 sm:text-[0.625rem]'
+        "
+      >
         {{ cfg.label }}
       </span>
 
       <!-- ambient overlay: watch button -->
       <button
-        v-if="mode === 'ambient'"
+        v-if="mode === 'ambient' && !bg"
         type="button"
         class="group absolute inset-0 grid place-items-end justify-start p-2.5 text-left sm:p-5"
         data-cursor="Watch"
@@ -203,11 +239,23 @@ defineExpose({ watchIntro })
 
       <!-- watch-mode controls -->
       <div
-        v-else
-        class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent px-4 pb-3 pt-10 text-white"
+        v-else-if="mode === 'watching'"
+        class="absolute z-30 text-white"
+        :class="
+          bg
+            ? 'bottom-4 left-4 right-4 rounded-2xl bg-black/60 px-4 pb-2 pt-3 backdrop-blur-md sm:left-auto sm:w-[28rem] lg:bottom-auto lg:right-8 lg:top-[calc(var(--nav-h)+1.25rem)]'
+            : 'inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent px-4 pb-3 pt-10'
+        "
         role="group"
         aria-label="Video controls"
       >
+        <p
+          v-if="bg && captionsOn && cueText"
+          class="mb-2 text-center text-sm leading-snug text-white"
+          aria-live="off"
+        >
+          {{ cueText }}
+        </p>
         <input
           type="range"
           min="0"
@@ -277,6 +325,16 @@ defineExpose({ watchIntro })
   height: 4px;
   accent-color: rgb(var(--c-cyan));
   cursor: pointer;
+}
+/* full-bleed: keep face + body in view — avatar sits right of centre in the source frame */
+.avatar-cover {
+  object-position: 62% 22%;
+}
+@media (max-width: 1023px) {
+  .avatar-cover { object-position: 58% 6%; }
+}
+@media (max-width: 639px) {
+  .avatar-cover { object-position: 57% 4%; }
 }
 video::cue {
   background: rgb(0 0 0 / 0.6);

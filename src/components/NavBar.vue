@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
     :class="
       scrolled || open
         ? 'border-b border-line/70 bg-bg/80 backdrop-blur-xl backdrop-saturate-150'
-        : 'border-b border-transparent bg-transparent'
+        : 'dark-scope border-b border-transparent bg-transparent text-ink'
     "
   >
     <a
