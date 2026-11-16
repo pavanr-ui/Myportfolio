@@ -61,6 +61,8 @@
 
     <!-- Apply saved / system theme before first paint to avoid a flash -->
     <script>
+      // JS is running: the pre-rendered static shell stays hidden until Vue replaces it
+      document.documentElement.classList.add('js')
       ;(function () {
         try {
           var s = localStorage.getItem('theme')
@@ -69,6 +71,21 @@
         } catch (e) {}
       })()
     </script>
+    <style>
+      /* pre-rendered static shell (see build/staticShell.js): visible to previews, crawlers and no-JS readers */
+      html.js .static-shell { display: none; }
+      html:not(.js) body { margin: 0; background: #060a18; color: #ecf1ff; }
+      .static-shell {
+        max-width: 46rem; margin: 0 auto; padding: 3rem 1.5rem 4rem;
+        font: 16px/1.65 Manrope, system-ui, sans-serif; color: #ecf1ff; background: #060a18;
+      }
+      .static-shell h1 { font: 400 3rem/1 'Instrument Serif', Georgia, serif; text-transform: uppercase; margin: 0.25rem 0 1rem; }
+      .static-shell h2 { font: 400 1.75rem/1.2 'Instrument Serif', Georgia, serif; text-transform: uppercase; margin: 2.5rem 0 0.75rem; color: #7dd3fc; }
+      .static-shell h3 { font-size: 1.05rem; margin: 1.25rem 0 0.25rem; }
+      .static-shell a { color: #7dd3fc; }
+      .static-shell small, .static-shell header > p:first-child { color: #94a0be; }
+      .static-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; padding: 0; list-style: none; }
+    </style>
   </head>
   <body>
     <noscript>
