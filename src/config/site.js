@@ -59,7 +59,7 @@ export const site = {
 
   contact: {
     /** e.g. 'hello@yourdomain.com' — enables the mailto link and the form's email fallback. */
-    email: '',
+    email: 'ramshettypavan@gmail.com',
     /** e.g. 'https://www.linkedin.com/in/your-handle' */
     linkedin: 'https://www.linkedin.com/in/pavan-ramshetty-5146a9112/',
     /** e.g. 'https://github.com/your-handle' */
