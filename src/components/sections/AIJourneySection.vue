@@ -1,10 +1,11 @@
 <script setup>
 import { ref, defineAsyncComponent } from 'vue'
-import { MessageSquareText, Sparkles, SquareTerminal, Code2, ShieldCheck } from 'lucide-vue-next'
+import { MessageSquareText, Sparkles, SquareTerminal, Code2, ShieldCheck, FlaskConical, BriefcaseBusiness } from 'lucide-vue-next'
 import SectionHeading from '../ui/SectionHeading.vue'
+import TiltCard from '../ui/TiltCard.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { ScrollTrigger, motion } from '@/composables/motion'
-import { aiTools, aiPractices, aiWorkflow } from '@/data/content'
+import { aiTools, aiPractices, aiWorkflow, aiBuilds, experience } from '@/data/content'
 
 const AIWorkspace = defineAsyncComponent(() => import('../AIWorkspace.vue'))
 const AITimeline = defineAsyncComponent(() => import('../AITimeline.vue'))
@@ -79,6 +80,43 @@ useScrollReveal(root, (el) => {
 
       <div class="mt-24" data-reveal>
         <AITimeline />
+      </div>
+
+      <!-- learning vs professional — kept clearly separate -->
+      <div class="mt-16 grid gap-3 sm:grid-cols-2" data-stagger="0.08">
+        <div class="glass flex items-start gap-4 rounded-2xl p-5">
+          <FlaskConical class="mt-0.5 h-5 w-5 shrink-0 text-warm" stroke-width="1.6" aria-hidden="true" />
+          <p class="text-sm leading-relaxed text-muted">
+            <span class="block font-semibold text-ink">Learning &amp; personal experiments</span>
+            Prompt engineering, Claude Code, AI tools and AI agents — explored on my own time and in the builds below.
+          </p>
+        </div>
+        <div class="glass flex items-start gap-4 rounded-2xl p-5">
+          <BriefcaseBusiness class="mt-0.5 h-5 w-5 shrink-0 text-cyan" stroke-width="1.6" aria-hidden="true" />
+          <p class="text-sm leading-relaxed text-muted">
+            <span class="block font-semibold text-ink">Professional work</span>
+            Frontend for AI Assistant features at {{ experience[0].company }} — part of my role as {{ experience[0].role }}.
+          </p>
+        </div>
+      </div>
+
+      <!-- real, completed AI-assisted builds -->
+      <div class="mt-16">
+        <p class="label mb-6" data-reveal>Completed AI-assisted builds</p>
+        <ul class="grid gap-4 md:grid-cols-2" data-stagger="0.1">
+          <TiltCard v-for="b in aiBuilds" :key="b.title" tag="li" :max="6">
+            <article class="flex h-full flex-col p-7">
+              <p class="flex items-center gap-2 font-mono text-[0.625rem] uppercase tracking-[0.18em] text-warm">
+                <FlaskConical class="h-3.5 w-3.5" aria-hidden="true" /> {{ b.kind }}
+              </p>
+              <h3 class="display mt-4 text-3xl">{{ b.title }}</h3>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-muted">{{ b.text }}</p>
+              <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tools used">
+                <li v-for="t in b.tools" :key="t" class="tag">{{ t }}</li>
+              </ul>
+            </article>
+          </TiltCard>
+        </ul>
       </div>
     </div>
 

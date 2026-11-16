@@ -10,16 +10,25 @@
     />
     <meta name="author" content="Pavan Ramshetty" />
     <meta name="theme-color" content="#060A18" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://myportfolio.ramshettypavan.workers.dev/" />
     <meta name="color-scheme" content="light dark" />
 
     <meta property="og:type" content="profile" />
+    <meta property="og:url" content="https://myportfolio.ramshettypavan.workers.dev/" />
+    <meta property="og:site_name" content="Pavan Ramshetty — Portfolio" />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:title" content="Pavan Ramshetty — Senior Frontend Developer" />
     <meta
       property="og:description"
       content="Building modern web experiences with Vue.js and AI-assisted development."
     />
-    <meta property="og:image" content="/og-image.svg" />
+    <meta property="og:image" content="https://myportfolio.ramshettypavan.workers.dev/media/avatar-poster.jpg" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:image:alt" content="Pavan Ramshetty — AI-generated avatar in a futuristic developer studio" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://myportfolio.ramshettypavan.workers.dev/media/avatar-poster.jpg" />
     <meta name="twitter:title" content="Pavan Ramshetty — Senior Frontend Developer" />
     <meta
       name="twitter:description"
@@ -27,6 +36,8 @@
     />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- hero video poster: start fetching early (it is the LCP image) -->
+    <link rel="preload" as="image" href="/media/avatar-poster.webp" type="image/webp" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -40,6 +51,9 @@
         "@type": "Person",
         "name": "Pavan Ramshetty",
         "jobTitle": "Senior Frontend Developer",
+        "url": "https://myportfolio.ramshettypavan.workers.dev/",
+        "image": "https://myportfolio.ramshettypavan.workers.dev/media/avatar-poster.jpg",
+        "sameAs": ["https://www.linkedin.com/in/pavan-ramshetty-5146a9112/", "https://github.com/pavanr-ui"],
         "worksFor": { "@type": "Organization", "name": "AlertDriving" },
         "knowsAbout": ["HTML5", "CSS3", "jQuery", "Vue.js", "JavaScript", "Ionic", "Quasar", "AI-assisted development"]
       }

@@ -238,3 +238,71 @@ export const aiJourney = [
     text: 'Moving toward small, practical AI-powered builds — starting with this portfolio, created with AI-assisted development.',
   },
 ]
+
+/**
+ * Skills grouped into the four categories shown in the Skills section.
+ * `icon` (Lucide) is used where there is no line glyph. No proficiency scores — by design.
+ */
+export const skillCategories = [
+  {
+    id: 'frontend',
+    title: 'Frontend',
+    blurb: 'The core of the web — structure, style and interactivity.',
+    items: [
+      { name: 'HTML5', note: 'Semantic, accessible document structure.' },
+      { name: 'CSS3', note: 'Responsive layouts, systems and motion.' },
+      { name: 'JavaScript', note: 'The language behind every interaction.' },
+      { name: 'jQuery', note: 'DOM scripting and established interfaces.' },
+      { name: 'Vue.js', note: 'Component-driven, reactive applications.' },
+    ],
+  },
+  {
+    id: 'frameworks',
+    title: 'Frameworks',
+    blurb: 'Vue-powered frameworks for cross-platform application experiences.',
+    items: [
+      { name: 'Ionic', note: 'Cross-platform application experiences.' },
+      { name: 'Quasar', note: 'Vue-powered UI across platforms.' },
+    ],
+  },
+  {
+    id: 'ai-tools',
+    title: 'AI Tools',
+    blurb: 'Tools I am learning and experimenting with to work faster — always reviewing the output.',
+    items: [
+      { name: 'ChatGPT', icon: 'MessageSquareText', note: 'Exploring ideas and drafting first approaches.' },
+      { name: 'Claude', icon: 'Sparkles', note: 'Reasoning through solutions and reviewing code.' },
+      { name: 'Claude Code', icon: 'SquareTerminal', note: 'Agentic, in-editor workflows across a codebase.' },
+      { name: 'GitHub Copilot', icon: 'Code2', note: 'Inline suggestions for routine code.' },
+    ],
+  },
+  {
+    id: 'development',
+    title: 'Development',
+    blurb: 'How I build — the practices behind the code.',
+    items: [
+      { name: 'Responsive UI', icon: 'MonitorSmartphone', note: 'Layouts that adapt from phone to wide desktop.' },
+      { name: 'Accessibility', icon: 'Accessibility', note: 'Semantic HTML, ARIA labels and keyboard support.' },
+      { name: 'Reusable Components', icon: 'Layers', note: 'Well-scoped building blocks that are easy to extend.' },
+      { name: 'AI-assisted development', icon: 'Wand2', note: 'AI drafts, a human reviews and verifies.' },
+    ],
+  },
+]
+
+/**
+ * Real AI-assisted builds (personal learning projects — not client or employer work).
+ */
+export const aiBuilds = [
+  {
+    title: 'This portfolio website',
+    kind: 'Personal project · completed',
+    text: 'Designed and built with AI-assisted development using Claude Code — Vue 3, Vite, Tailwind, GSAP and Three.js — with every change reviewed and tested in the browser.',
+    tools: ['Claude Code', 'Vue 3', 'GSAP', 'Three.js'],
+  },
+  {
+    title: 'AI digital-human intro video',
+    kind: 'Personal experiment · completed',
+    text: 'Turned my own photo into a studio portrait with Google AI Studio, then generated the talking intro video in the hero with Google Flow — checking that the face stays true to me.',
+    tools: ['Google AI Studio', 'Google Flow', 'Prompt engineering'],
+  },
+]

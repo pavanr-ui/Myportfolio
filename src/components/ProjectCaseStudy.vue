@@ -146,7 +146,7 @@ onBeforeUnmount(() => {
           </p>
         </div>
         <div class="lg:col-span-3 lg:col-start-8" data-pt>
-          <p class="label mb-4">Focus</p>
+          <p class="label mb-4">Key features</p>
           <ul class="space-y-3">
             <li v-for="f in shown.focus" :key="f" class="flex gap-3">
               <span class="mt-2.5 h-px w-4 shrink-0 bg-accent" aria-hidden="true" />{{ f }}

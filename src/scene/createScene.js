@@ -142,12 +142,12 @@ export function createScene(canvas, { mobile = false } = {}) {
   // ── floating geometric objects along the page ─────────────
   const floaters = []
   const shapes = [
-    { geo: new IcosahedronGeometry(1.4, 1), color: CYAN, at: [-15, -9, -11] },
-    { geo: new OctahedronGeometry(1.1, 0), color: PURPLE, at: [15, -15, -10] },
-    { geo: new TorusGeometry(1.2, 0.35, 12, 40), color: BLUE, at: [-15.5, -21, -11] },
-    { geo: new DodecahedronGeometry(1.2, 0), color: CYAN, at: [15.5, -27, -10] },
-    { geo: new IcosahedronGeometry(1.0, 0), color: PURPLE, at: [-14.5, -33, -9] },
-    { geo: new OctahedronGeometry(0.9, 0), color: BLUE, at: [14.5, -38, -8] },
+    { geo: new IcosahedronGeometry(1.4, 1), color: CYAN, at: [-19, -9, -12] },
+    { geo: new OctahedronGeometry(1.1, 0), color: PURPLE, at: [19, -15, -12] },
+    { geo: new TorusGeometry(1.2, 0.35, 12, 40), color: BLUE, at: [-19.5, -21, -12] },
+    { geo: new DodecahedronGeometry(1.2, 0), color: CYAN, at: [19.5, -27, -12] },
+    { geo: new IcosahedronGeometry(1.0, 0), color: PURPLE, at: [-18.5, -33, -11] },
+    { geo: new OctahedronGeometry(0.9, 0), color: BLUE, at: [18.5, -38, -10] },
   ]
   for (const s of shapes) {
     const wire = new Mesh(s.geo, new MeshBasicMaterial({ color: s.color, wireframe: true, transparent: true, opacity: 0.22, blending: AdditiveBlending, depthWrite: false }))

@@ -4,8 +4,22 @@ import AboutVisual from '../AboutVisual.vue'
 import ProfileCard from '../ProfileCard.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { gsap, SplitText } from '@/composables/motion'
-import { aboutBlocks } from '@/data/content'
+import { aboutBlocks, experience, skillCategories } from '@/data/content'
 import { site } from '@/config/site'
+
+// Stats are derived from real data only — nothing hard-coded or invented.
+const monthsAt = (() => {
+  const [y, m] = experience[0].start.split('-').map(Number)
+  const now = new Date()
+  return Math.max(0, (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m))
+})()
+const countIn = (...ids) => skillCategories.filter((c) => ids.includes(c.id)).reduce((n, c) => n + c.items.length, 0)
+const stats = [
+  { value: site.experienceYears, suffix: '+', label: 'Years of experience' },
+  { value: monthsAt, suffix: '', label: `Months at ${experience[0].company}` },
+  { value: countIn('frontend', 'frameworks'), suffix: '', label: 'Core frontend technologies' },
+  { value: countIn('ai-tools'), suffix: '', label: 'AI tools I am exploring' },
+]
 
 const root = ref(null)
 
@@ -88,6 +102,16 @@ useScrollReveal(root, (el) => {
           </p>
         </div>
       </div>
+
+      <!-- animated statistics (computed from real data) -->
+      <dl class="mt-20 grid grid-cols-2 gap-4 lg:mt-24 lg:grid-cols-4" data-stagger="0.08">
+        <div v-for="st in stats" :key="st.label" class="glass glow-border flex flex-col rounded-2xl px-6 py-7">
+          <dt class="label order-2 mt-3 block text-[0.625rem]">{{ st.label }}</dt>
+          <dd class="font-display text-5xl leading-none sm:text-6xl">
+            <span :data-count="st.value">{{ st.value }}</span><span class="text-accent">{{ st.suffix }}</span>
+          </dd>
+        </div>
+      </dl>
 
       <!-- three storytelling blocks on an animated timeline -->
       <div class="about-tl relative mt-24 pl-8 lg:mt-36 lg:pl-14">
