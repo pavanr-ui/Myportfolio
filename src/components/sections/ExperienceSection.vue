@@ -49,7 +49,7 @@ useScrollReveal(root, (el) => {
         <!-- spine -->
         <span class="absolute bottom-0 left-0 top-2 w-px bg-line sm:left-[13.5rem]" aria-hidden="true" />
         <span
-          class="tl-spine absolute bottom-0 left-0 top-2 w-px origin-top bg-accent sm:left-[13.5rem]"
+          class="tl-spine absolute bottom-0 left-0 top-2 w-px origin-top bg-gradient-to-b from-cyan via-accent to-warm shadow-[0_0_12px_rgb(var(--c-accent)/0.6)] sm:left-[13.5rem]"
           aria-hidden="true"
         />
         <span class="absolute bottom-0 left-0 top-2 w-px sm:left-[13.5rem]" aria-hidden="true">
@@ -80,7 +80,7 @@ useScrollReveal(root, (el) => {
           </div>
 
           <article
-            class="rounded-2xl border border-line bg-bg p-7 shadow-[0_1px_0_rgb(var(--c-line))] transition-shadow duration-700 hover:shadow-[0_30px_60px_-30px_rgb(var(--c-ink)/0.18)] sm:ml-12 sm:p-10"
+            class="glass glow-border rounded-2xl p-7 sm:ml-12 sm:p-10"
             data-reveal="mask"
           >
             <header class="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-6">
@@ -94,7 +94,7 @@ useScrollReveal(root, (el) => {
             <p class="mt-6 max-w-2xl leading-relaxed text-muted">{{ job.summary }}</p>
 
             <!-- milestones: start → today, with tenure -->
-            <div class="mt-8 rounded-2xl border border-line bg-subtle/60 p-5" data-reveal>
+            <div class="glass mt-8 rounded-2xl p-5" data-reveal>
               <div class="flex items-center justify-between font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-muted">
                 <span>Oct 2024 · Joined</span>
                 <span class="text-accent-ink">{{ tenure(job.start) }}</span>

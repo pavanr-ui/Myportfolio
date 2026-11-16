@@ -1,18 +1,21 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
-import { ArrowRight, ArrowUpRight } from 'lucide-vue-next'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ArrowRight, ArrowUpRight, Play } from 'lucide-vue-next'
 import BaseButton from '../ui/BaseButton.vue'
-import ResumeButton from '../ui/ResumeButton.vue'
 import ProfilePortrait from '../ProfilePortrait.vue'
+import AvatarVideo from '../AvatarVideo.vue'
 import { gsap, SplitText, appState, motion, fontsReady } from '@/composables/motion'
 import { site } from '@/config/site'
 import { experience } from '@/data/content'
 import { useGreeting } from '@/composables/useGreeting'
 
-// heavy-ish visual, only fetched for full-motion visitors
-const HeroParticles = motion.full ? defineAsyncComponent(() => import('../HeroParticles.vue')) : null
-
 const root = ref(null)
+const avatar = ref(null)
+const hasVideo = !!site.avatarVideo?.src
+function watchIntro() {
+  if (avatar.value) avatar.value.watchIntro()
+  else document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+}
 const years = ref(String(site.experienceYears))
 const current = experience[0]
 const greeting = useGreeting()
@@ -34,37 +37,29 @@ function setup(el) {
   // hidden start states — the intro curtain (or nothing yet painted) covers these
   gsap.set(chars ? name.chars : name.lines, { yPercent: 115, rotate: chars ? 8 : 0 })
   gsap.set(q('.hero-fade'), { autoAlpha: 0, y: 24 })
-  gsap.set(q('.portrait-frame'), { clipPath: 'inset(100% 0% 0% 0%)' })
-  gsap.set(q('.portrait-img'), { scale: 1.4 })
+  gsap.set(q('.hero-visual'), { clipPath: 'inset(0% 0% 0% 100% round 28px)', scale: 0.96, autoAlpha: 1 })
+  gsap.set(q('.scroll-cue'), { autoAlpha: 0 })
+  // photo-portrait fallback (when no avatar video is configured)
   gsap.set(q('.portrait-slat'), { yPercent: 0, autoAlpha: 1 })
-  gsap.set(q('.portrait-outline, .portrait-badge, .portrait-label, .hero-deco, .scroll-cue'), { autoAlpha: 0 })
+  gsap.set(q('.portrait-outline, .portrait-badge, .portrait-label'), { autoAlpha: 0 })
 
   intro = gsap
     .timeline({ paused: true, defaults: { ease: 'expo.out', duration: 1.3 } })
     .to(q('.hero-bg'), { autoAlpha: 1, duration: 1.6 }, 0)
-    .to(q('.portrait-frame'), { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut' }, 0)
+    .to(q('.hero-visual'), { clipPath: 'inset(0% 0% 0% 0% round 28px)', scale: 1, duration: 1.6, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.15)
     .to(q('.portrait-slat'), { yPercent: 101, duration: 1.2, ease: 'expo.inOut', stagger: { each: 0.08, from: 'center' } }, 0.75)
-    .to(q('.portrait-img'), { scale: 1.12, duration: 2.4 }, 0.6)
     .to(chars ? name.chars : name.lines, { yPercent: 0, rotate: 0, stagger: chars ? 0.035 : 0.12 }, 0.2)
     .to(q('.hero-fade'), { autoAlpha: 1, y: 0, stagger: 0.07 }, 0.5)
     .to(counter, { v: site.experienceYears, duration: 1.6, ease: 'power3.out', onUpdate: () => (years.value = String(Math.round(counter.v))) }, 0.9)
-    .to(q('.portrait-outline'), { autoAlpha: 1, duration: 1.2 }, 1.2)
-    .to(q('.portrait-badge'), { autoAlpha: 1, duration: 1 }, 1.35)
+    .to(q('.portrait-outline, .portrait-badge'), { autoAlpha: 1, duration: 1.2 }, 1.2)
     .fromTo(q('.portrait-label'), { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 1 }, 1.4)
-    .to(q('.hero-deco, .scroll-cue'), { autoAlpha: 1, stagger: 0.06, duration: 1.2 }, 1.5)
+    .to(q('.scroll-cue'), { autoAlpha: 1, duration: 1.2 }, 1.5)
     .call(() => (typeReady = true))
   let typeReady = false
 
-  // gentle floating for decorative marks and technical labels
-  if (motion.full) {
-    q('.portrait-label, .hero-deco').forEach((d, i) => {
-      gsap.to(d, { y: i % 2 ? 10 : -10, duration: 3.5 + (i % 3), ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2 + i * 0.2 })
-    })
-  }
-
-  // scroll: photo drifts inside the frame, background layers move at different speeds, copy lifts away
+  // scroll: the avatar recedes slightly, background layers move at different speeds, copy lifts away
   const st = { trigger: el, start: 'top top', end: 'bottom top', scrub: true }
-  gsap.to(q('.portrait-img'), { yPercent: 8, ease: 'none', scrollTrigger: st })
+  gsap.to(q('.hero-visual-wrap'), { y: 60, scale: 0.94, ease: 'none', scrollTrigger: st })
   gsap.to(q('.hero-grid'), { yPercent: 18, ease: 'none', scrollTrigger: st })
   gsap.to(q('.hero-copy'), { y: -70, autoAlpha: 0.2, ease: 'none', scrollTrigger: { ...st, start: 'center center' } })
 
@@ -139,18 +134,12 @@ onBeforeUnmount(() => {
   >
     <!-- background layers -->
     <div class="hero-bg pointer-events-none absolute inset-0" :class="motion.animate ? 'invisible opacity-0' : ''" aria-hidden="true">
-      <div class="hero-grid bg-grid mask-radial absolute -inset-y-24 inset-x-0" />
-      <component :is="HeroParticles" v-if="HeroParticles" />
-    </div>
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <div data-depth="24" class="hero-deco absolute -bottom-56 -right-48 h-[36rem] w-[36rem] rounded-full border border-line" />
-      <div data-depth="-30" class="hero-deco absolute left-[46%] top-[18%] hidden text-2xl font-light text-accent lg:block">+</div>
-      <div data-depth="40" class="hero-deco absolute bottom-[22%] left-[38%] hidden h-2 w-2 rounded-full bg-accent/70 lg:block" />
+      <div class="hero-grid bg-grid mask-radial absolute -inset-y-24 inset-x-0 opacity-70" />
     </div>
 
     <div class="container-site relative grid items-center gap-16 lg:grid-cols-12 lg:gap-10">
       <!-- copy -->
-      <div class="hero-copy lg:col-span-7">
+      <div class="hero-copy lg:col-span-6">
         <p
           v-if="site.availability?.show"
           class="hero-fade mb-8 inline-flex items-center gap-2.5 rounded-full border border-line bg-bg/70 py-1.5 pl-3 pr-4 text-xs font-medium backdrop-blur"
@@ -169,9 +158,9 @@ onBeforeUnmount(() => {
           The digital identity of
         </p>
 
-        <h1 id="hero-title" class="hero-name display-caps text-[clamp(3.1rem,8.6vw,8.25rem)]">
+        <h1 id="hero-title" class="hero-name display-caps text-[clamp(3rem,7vw,7rem)]">
           Pavan<br />
-          <em class="text-accent-ink">Ramshetty</em>
+          <em class="text-accent-ink [text-shadow:0_0_36px_rgb(var(--c-accent)/0.45)]">Ramshetty</em>
         </h1>
 
         <p class="hero-fade mt-8 text-lg font-semibold tracking-tight sm:text-xl">
@@ -189,13 +178,16 @@ onBeforeUnmount(() => {
         </p>
 
         <div class="hero-fade mt-10 flex flex-wrap items-center gap-3">
-          <BaseButton href="#projects" cursor="Explore">
-            Explore My Work
+          <BaseButton v-if="hasVideo" cursor="Watch" @click="watchIntro">
+            <Play class="h-4 w-4" fill="currentColor" aria-hidden="true" />
+            Watch My Intro
+          </BaseButton>
+          <BaseButton href="#projects" :variant="hasVideo ? 'outline' : 'primary'" cursor="Explore">
+            View Projects
             <ArrowRight class="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" aria-hidden="true" />
           </BaseButton>
-          <ResumeButton />
           <BaseButton href="#contact" variant="ghost">
-            <span class="link-underline">Let’s Connect</span>
+            <span class="link-underline">Contact Me</span>
             <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
           </BaseButton>
         </div>
@@ -217,9 +209,12 @@ onBeforeUnmount(() => {
         </dl>
       </div>
 
-      <!-- portrait -->
-      <div class="lg:col-span-5 lg:pl-6">
-        <ProfilePortrait />
+      <!-- avatar video (or the photo portrait when no video is configured) -->
+      <div class="hero-visual-wrap lg:col-span-6 lg:pl-4">
+        <div class="hero-visual" :class="motion.animate ? 'invisible' : ''">
+          <AvatarVideo v-if="hasVideo" ref="avatar" />
+          <ProfilePortrait v-else />
+        </div>
       </div>
     </div>
 

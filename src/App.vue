@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
 import CinematicIntro from './components/CinematicIntro.vue'
+import Background3D from './components/Background3D.vue'
 import NavBar from './components/NavBar.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import SectionProgress from './components/SectionProgress.vue'
@@ -34,6 +35,7 @@ watch(
 
 <template>
   <CinematicIntro />
+  <Background3D />
   <component :is="CustomCursor" v-if="CustomCursor" />
   <NavBar />
   <SectionProgress />

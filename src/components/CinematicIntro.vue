@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
       class="in-dots mask-radial absolute inset-0"
       data-z="-12"
       aria-hidden="true"
-      style="background-image: radial-gradient(rgb(128 149 181 / 0.55) 1.2px, transparent 1.6px); background-size: 72px 72px; background-position: calc(50% - 36px) calc(50% - 36px)"
+      style="background-image: radial-gradient(rgb(56 189 248 / 0.55) 1.2px, transparent 1.6px); background-size: 72px 72px; background-position: calc(50% - 36px) calc(50% - 36px)"
     />
     <div class="absolute inset-0" data-z="30" aria-hidden="true">
       <span
@@ -214,7 +214,7 @@ onBeforeUnmount(() => {
         <p class="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
           <span class="in-role font-sans text-[0.75rem] font-semibold tracking-[0.38em] text-paper/85">SENIOR FRONTEND DEVELOPER</span>
           <span class="in-role hidden text-steel sm:inline" aria-hidden="true">|</span>
-          <span class="in-role font-sans text-[0.75rem] font-semibold tracking-[0.38em] text-[#C9A97A]">AI-ASSISTED DEVELOPER</span>
+          <span class="in-role font-sans text-[0.75rem] font-semibold tracking-[0.38em] text-[#A78BFA]">AI-ASSISTED DEVELOPER</span>
         </p>
       </div>
     </div>

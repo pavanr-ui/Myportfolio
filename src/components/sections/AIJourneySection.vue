@@ -63,7 +63,7 @@ useScrollReveal(root, (el) => {
         <li
           v-for="tool in aiTools"
           :key="tool.name"
-          class="group relative overflow-hidden rounded-2xl border border-line bg-surface/60 p-7 transition-[border-color,transform] duration-700 ease-expo hover:-translate-y-1.5 hover:border-accent/60"
+          class="glass glow-border group relative overflow-hidden rounded-2xl p-7 transition-transform duration-700 ease-expo hover:-translate-y-1.5"
           @pointermove="spot"
         >
           <div class="ai-glow pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true" />

@@ -2,6 +2,7 @@
 import { ref, defineAsyncComponent } from 'vue'
 import SectionHeading from '../ui/SectionHeading.vue'
 import SkillGlyph from '../SkillGlyph.vue'
+import TiltCard from '../ui/TiltCard.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { skills, skillGroups } from '@/data/content'
 
@@ -15,13 +16,6 @@ const filter = ref('All')
 const matches = (s) => filter.value === 'All' || s.group === filter.value
 const count = (g) => (g === 'All' ? skills.length : skills.filter((s) => s.group === g).length)
 
-// soft spotlight that follows the pointer across a skill card
-function spot(e) {
-  const el = e.currentTarget
-  const r = el.getBoundingClientRect()
-  el.style.setProperty('--mx', `${e.clientX - r.left}px`)
-  el.style.setProperty('--my', `${e.clientY - r.top}px`)
-}
 
 useScrollReveal(root)
 </script>
@@ -58,40 +52,35 @@ useScrollReveal(root)
         </button>
       </div>
 
-      <ul class="grid grid-cols-1 border-l border-t border-line sm:grid-cols-2 lg:grid-cols-4" data-stagger="0.07">
-        <li
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" data-stagger="0.07">
+        <TiltCard
           v-for="(s, i) in skills"
           :key="s.name"
-          class="group relative flex min-h-[15rem] flex-col justify-between overflow-hidden border-b border-r border-line p-7 transition-[opacity,background-color] duration-500"
-          :class="matches(s) ? 'opacity-100 hover:bg-subtle' : 'opacity-30'"
+          tag="li"
+          :max="10"
+          class="transition-opacity duration-500"
+          :class="matches(s) ? 'opacity-100' : 'opacity-30'"
           :aria-hidden="matches(s) ? undefined : 'true'"
-          @pointermove="spot"
         >
-          <div
-            class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-            style="background: radial-gradient(16rem circle at var(--mx, 50%) var(--my, 50%), rgb(var(--c-accent) / 0.14), transparent 60%)"
-            aria-hidden="true"
-          />
-          <div class="relative flex items-start justify-between">
-            <span class="font-display text-lg italic text-accent-ink">{{ String(i + 1).padStart(2, '0') }}</span>
-            <span class="label text-[0.625rem]">{{ s.group }}</span>
+          <div class="flex min-h-[15rem] flex-col justify-between p-7">
+            <div class="flex items-start justify-between">
+              <span class="font-display text-lg italic text-accent-ink">{{ String(i + 1).padStart(2, '0') }}</span>
+              <span class="label text-[0.625rem]">{{ s.group }}</span>
+            </div>
+            <SkillGlyph
+              :name="s.name"
+              class="mt-6 text-muted transition-[color,transform] duration-700 ease-expo group-hover:rotate-[-8deg] group-hover:scale-110 group-hover:text-cyan"
+            />
+            <div>
+              <h3 class="display text-[2.75rem] transition-transform duration-700 ease-expo group-hover:-translate-y-1 sm:text-5xl">
+                {{ s.name }}
+              </h3>
+              <p class="mt-3 text-sm leading-relaxed text-muted">{{ s.note }}</p>
+            </div>
           </div>
-          <SkillGlyph :name="s.name" class="relative mt-6 text-muted transition-colors duration-500 group-hover:text-accent-ink" />
-          <div class="relative">
-            <h3
-              class="display text-[2.75rem] transition-transform duration-700 ease-expo group-hover:-translate-y-1 sm:text-5xl"
-            >
-              {{ s.name }}
-            </h3>
-            <p class="mt-3 text-sm leading-relaxed text-muted">{{ s.note }}</p>
-          </div>
-          <span
-            class="absolute bottom-0 left-0 h-[2px] w-full origin-left scale-x-0 bg-accent transition-transform duration-700 ease-expo group-hover:scale-x-100"
-            aria-hidden="true"
-          />
-        </li>
+        </TiltCard>
         <!-- closing tile completes the grid at lg (7 skills + 1) -->
-        <li class="hidden flex-col justify-end border-b border-r border-line bg-subtle/60 p-7 lg:flex" aria-hidden="true">
+        <li class="glass hidden flex-col justify-end rounded-2xl p-7 lg:flex" aria-hidden="true">
           <p class="font-display text-2xl italic leading-snug text-muted">…and always learning the next one.</p>
         </li>
       </ul>

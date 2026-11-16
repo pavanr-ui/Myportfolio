@@ -32,7 +32,7 @@ function flip() {
       >
         <!-- front -->
         <div
-          class="absolute inset-0 flex flex-col overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.5)]"
+          class="glass absolute inset-0 flex flex-col overflow-hidden rounded-3xl p-6 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.5)]"
           style="backface-visibility: hidden"
           :aria-hidden="flipped"
         >

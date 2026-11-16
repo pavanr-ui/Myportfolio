@@ -26,6 +26,20 @@ export const site = {
     label: 'Open to new opportunities',
   },
 
+  /**
+   * Hero avatar video (AI-generated digital human from your own photo).
+   * Plays muted + looped as ambience; "Watch My Intro" restarts it with sound and captions.
+   * Paths are relative to /public. Set `src: ''` to fall back to the photo portrait.
+   */
+  avatarVideo: {
+    src: '/media/avatar-intro.mp4',
+    poster: '/media/avatar-poster.webp',
+    captions: '/media/avatar-intro.vtt',
+    width: 1280,
+    height: 720,
+    label: 'AI-generated avatar',
+  },
+
   /** Cinematic intro: plays once per browser session (never for reduced-motion users). */
   intro: { enabled: true },
 

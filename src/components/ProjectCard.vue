@@ -29,7 +29,7 @@ defineExpose({ media })
     <!-- visual: click is a mouse convenience; the "View details" button is the accessible control -->
     <div
       ref="media"
-      class="pj-media relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-line bg-subtle"
+      class="pj-media glow-border relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-line bg-subtle"
       data-cursor="View"
       :data-reveal="stacked ? 'mask' : undefined"
       @click="open"
@@ -103,6 +103,15 @@ defineExpose({ media })
             <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
           </span>
         </button>
+        <a
+          v-if="project.url"
+          :href="project.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-ink"
+        >
+          <ArrowUpRight class="h-4 w-4" aria-hidden="true" /> Live Demo
+        </a>
         <a
           v-if="project.github"
           :href="project.github"

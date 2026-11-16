@@ -157,8 +157,8 @@ const floatLabel =
       <div class="grid gap-16 lg:grid-cols-12 lg:gap-12">
         <!-- channels -->
         <div class="lg:col-span-5">
-          <ul class="border-t border-line" data-stagger="0.08">
-            <li v-for="c in channels" :key="c.label" class="border-b border-line">
+          <ul class="grid gap-3" data-stagger="0.08">
+            <li v-for="c in channels" :key="c.label" class="glass glow-border rounded-2xl px-5 transition-transform duration-500 ease-expo hover:-translate-y-0.5">
               <a
                 v-if="c.href"
                 :href="c.href"
@@ -201,7 +201,7 @@ const floatLabel =
         <!-- form -->
         <div class="lg:col-span-7" data-reveal>
           <form
-            class="rounded-3xl border border-line bg-bg p-7 sm:p-10"
+            class="glass glow-border rounded-3xl p-7 sm:p-10"
             novalidate
             aria-describedby="form-mode"
             @submit.prevent="submit"

@@ -16,6 +16,7 @@ npm run preview  # preview the production build
 | What | Where |
 | --- | --- |
 | Profile photo | `src/assets/Mypic.jpg`, imported in `src/config/site.js` (replace the file to update it). Adjust the framing with `photoPosition` in `src/config/site.js`. Until then a monogram frame is shown. |
+| Hero avatar video | `avatarVideo` in `src/config/site.js` → `public/media/avatar-intro.mp4`, poster `avatar-poster.webp`, captions `avatar-intro.vtt`. Empty `src` falls back to the photo portrait. |
 | Availability badge | `availability` in `src/config/site.js` — a static, editable label (`show: false` hides it). |
 | Intro | `intro.enabled` in `src/config/site.js`. Plays once per browser session; never for reduced motion; Skip button + Esc. |
 | Résumé | Put the PDF in `public/` (e.g. `public/resume.pdf`) and set `resumeUrl: '/resume.pdf'` in `src/config/site.js`. Until then resume buttons read **Request Resume** and go to Contact. |
@@ -59,5 +60,8 @@ src/
 Reusable composables: `useScrollReveal` (declarative `data-*` animations), `useTextReveal`, `useParallax`,
 `useMagneticHover`, `usePageTransition`, `useSound` (interface sounds, off by default). All GSAP work runs inside
 `gsap.context()` and is reverted on unmount, so ScrollTriggers never leak or duplicate.
+
+3D background: `src/components/Background3D.vue` + `src/scene/createScene.js` (Three.js, one canvas, unlit materials,
+GPU-animated particles). Loaded lazily only for full motion + WebGL + dark theme; everyone else gets a static gradient.
 
 Heavy pieces are lazy-loaded: custom cursor, hero particles, skills orbit, AI workspace and case studies.

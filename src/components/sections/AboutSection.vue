@@ -10,6 +10,12 @@ import { site } from '@/config/site'
 const root = ref(null)
 
 useScrollReveal(root, (el) => {
+  const tl = el.querySelector('.about-tl')
+  gsap.fromTo(
+    el.querySelector('.about-tl-fill'),
+    { scaleY: 0 },
+    { scaleY: 1, ease: 'none', scrollTrigger: { trigger: tl, start: 'top 70%', end: 'bottom 65%', scrub: true } },
+  )
   // the statement inks in word by word, tied to scroll progress (no hijacking — native scroll)
   const statement = el.querySelector('.about-statement')
   const split = SplitText.create(statement, { type: 'words' })
@@ -83,10 +89,18 @@ useScrollReveal(root, (el) => {
         </div>
       </div>
 
-      <!-- three storytelling blocks -->
-      <div class="mt-24 lg:mt-36">
+      <!-- three storytelling blocks on an animated timeline -->
+      <div class="about-tl relative mt-24 pl-8 lg:mt-36 lg:pl-14">
+        <span class="absolute bottom-0 left-[7px] top-0 w-px bg-line lg:left-[19px]" aria-hidden="true" />
+        <span
+          class="about-tl-fill absolute bottom-0 left-[7px] top-0 w-px origin-top bg-gradient-to-b from-cyan via-accent to-warm shadow-[0_0_12px_rgb(var(--c-accent)/0.6)] lg:left-[19px]"
+          aria-hidden="true"
+        />
         <article v-for="b in aboutBlocks" :key="b.index" class="relative py-14 lg:py-20">
-          <span class="absolute inset-x-0 top-0 h-px bg-line" data-line aria-hidden="true" />
+          <span
+            class="absolute -left-8 top-[4.6rem] grid h-[15px] w-[15px] place-items-center rounded-full border-2 border-accent bg-bg shadow-[0_0_0_6px_rgb(var(--c-accent)/0.15)] lg:-left-14 lg:top-[6.1rem] lg:ml-3"
+            aria-hidden="true"
+          />
           <div class="grid items-center gap-10 lg:grid-cols-12">
             <div class="lg:col-span-6">
               <p class="mb-6 flex items-center gap-4" data-reveal>
@@ -100,7 +114,7 @@ useScrollReveal(root, (el) => {
               </ul>
             </div>
             <div class="lg:col-span-5 lg:col-start-8">
-              <div class="aspect-[3/2] overflow-hidden rounded-2xl border border-line" data-reveal="mask">
+              <div class="glow-border aspect-[3/2] overflow-hidden rounded-2xl border border-line" data-reveal="mask">
                 <div class="h-full w-full scale-110" data-parallax="0.12">
                   <AboutVisual :variant="b.visual" />
                 </div>
@@ -108,7 +122,6 @@ useScrollReveal(root, (el) => {
             </div>
           </div>
         </article>
-        <span class="block h-px bg-line" data-line aria-hidden="true" />
       </div>
     </div>
   </section>
