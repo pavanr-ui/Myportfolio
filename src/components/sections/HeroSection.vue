@@ -12,7 +12,26 @@ import { useGreeting } from '@/composables/useGreeting'
 const root = ref(null)
 const avatar = ref(null)
 const hasVideo = !!site.avatarVideo?.src
-const watching = ref(false) // while the intro plays with sound, the copy steps back on small screens
+const watching = ref(false)
+// three depth layers of floating particles: far (small, blurred, slow) -> near (larger, brighter, faster)
+const particleLayers = [
+  { depth: 8, count: 14, size: [1, 2], blur: 1, dur: [16, 24], alpha: 0.35 },
+  { depth: 18, count: 10, size: [2, 3], blur: 0.5, dur: [12, 18], alpha: 0.55 },
+  { depth: 32, count: 6, size: [3, 5], blur: 0, dur: [9, 14], alpha: 0.7 },
+].map((l, li) => ({
+  ...l,
+  dots: Array.from({ length: l.count }, (_, i) => {
+    const r = (n) => ((Math.sin((li * 97 + i) * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1
+    return {
+      left: 35 + r(1) * 63, // mostly over the bright (avatar) side
+      top: 8 + r(2) * 84,
+      size: l.size[0] + r(3) * (l.size[1] - l.size[0]),
+      dur: l.dur[0] + r(4) * (l.dur[1] - l.dur[0]),
+      delay: -r(5) * 20,
+      hue: r(6) > 0.5 ? 'var(--c-cyan)' : 'var(--c-warm)',
+    }
+  }),
+})) // while the intro plays with sound, the copy steps back on small screens
 function watchIntro() {
   if (avatar.value) avatar.value.watchIntro()
   else document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
@@ -60,7 +79,7 @@ function setup(el) {
 
   // scroll: the avatar recedes slightly, background layers move at different speeds, copy lifts away
   const st = { trigger: el, start: 'top top', end: 'bottom top', scrub: true }
-  gsap.to(q('.hero-visual-wrap'), { yPercent: 14, ease: 'none', scrollTrigger: st })
+  gsap.to(q('.hero-visual-wrap'), { yPercent: 9, ease: 'none', scrollTrigger: st })
   gsap.to(q('.hero-grid'), { yPercent: 18, ease: 'none', scrollTrigger: st })
   gsap.to(q('.hero-copy'), { y: -70, autoAlpha: 0.2, ease: 'none', scrollTrigger: { ...st, start: 'center center' } })
 
@@ -134,7 +153,10 @@ onBeforeUnmount(() => {
     aria-labelledby="hero-title"
   >
     <!-- full-bleed avatar video (or the photo portrait when no video is configured) -->
-    <div class="hero-visual-wrap absolute inset-x-0 top-0 -z-20 h-[100svh] lg:bottom-0 lg:h-auto">
+    <div
+      class="hero-visual-wrap absolute inset-x-0 top-0 -z-20 h-[100svh] lg:-bottom-3 lg:-right-3 lg:-top-3 lg:left-[14%] lg:h-auto lg:[mask-image:linear-gradient(to_right,transparent,#000_26%)]"
+      data-depth="-10"
+    >
       <div class="hero-visual absolute inset-0" :class="motion.animate ? 'invisible' : ''">
         <AvatarVideo v-if="hasVideo" ref="avatar" variant="background" @mode="(m) => (watching = m === 'watching')" />
         <div v-else class="container-site flex h-full items-center justify-end">
@@ -146,15 +168,16 @@ onBeforeUnmount(() => {
     <!-- readability: dark gradients (from the copy side, the top for the nav, the bottom into the page) -->
     <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
       <div class="absolute inset-0 bg-gradient-to-t from-abyss via-abyss/80 via-55% to-transparent lg:hidden" />
-      <div class="absolute inset-0 hidden bg-gradient-to-r from-abyss/95 via-abyss/70 via-45% to-transparent lg:block" />
-      <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-abyss/70 to-transparent" />
+      <div class="absolute inset-0 hidden bg-gradient-to-r from-abyss via-abyss/80 via-32% to-transparent to-62% lg:block" />
+      <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-abyss/55 to-transparent" />
       <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-abyss to-transparent" />
       <!-- blue / purple ambient light -->
       <div
         class="absolute inset-0 mix-blend-screen"
         style="
-          background: radial-gradient(42rem 30rem at 82% 18%, rgb(var(--c-cyan) / 0.16), transparent 65%),
-            radial-gradient(40rem 30rem at 8% 92%, rgb(var(--c-warm) / 0.2), transparent 65%);
+          background: radial-gradient(34rem 26rem at 62% 30%, rgb(var(--c-accent) / 0.14), transparent 70%),
+            radial-gradient(30rem 40rem at 92% 40%, rgb(var(--c-cyan) / 0.14), transparent 70%),
+            radial-gradient(44rem 28rem at 12% 96%, rgb(var(--c-warm) / 0.22), transparent 65%);
         "
       />
     </div>
@@ -162,6 +185,28 @@ onBeforeUnmount(() => {
     <!-- subtle futuristic grid over the video -->
     <div class="hero-bg pointer-events-none absolute inset-0 -z-[5]" :class="motion.animate ? 'invisible opacity-0' : ''" aria-hidden="true">
       <div class="hero-grid bg-grid mask-radial absolute -inset-y-24 inset-x-0 opacity-30" />
+    </div>
+
+    <!-- subtle floating particles in three depth layers (CSS only; static for simplified/reduced motion) -->
+    <div class="pointer-events-none absolute inset-0 -z-[4] overflow-hidden" aria-hidden="true">
+      <div v-for="(layer, li) in particleLayers" :key="li" class="absolute inset-0" :data-depth="layer.depth">
+        <span
+          v-for="(d, i) in layer.dots"
+          :key="i"
+          class="hero-particle css-loop absolute rounded-full"
+          :style="{
+            left: d.left + '%',
+            top: d.top + '%',
+            width: d.size + 'px',
+            height: d.size + 'px',
+            background: `rgb(${d.hue} / ${layer.alpha})`,
+            boxShadow: `0 0 ${d.size * 4}px rgb(${d.hue} / ${layer.alpha * 0.8})`,
+            filter: layer.blur ? `blur(${layer.blur}px)` : undefined,
+            animationDuration: d.dur + 's',
+            animationDelay: d.delay + 's',
+          }"
+        />
+      </div>
     </div>
 
     <div class="container-site relative" :class="watching ? 'max-lg:pointer-events-none' : ''">
@@ -181,33 +226,33 @@ onBeforeUnmount(() => {
           {{ site.availability.label }}
         </p>
 
-        <p class="hero-fade label mb-5 flex flex-wrap items-center gap-3">
+        <p class="hero-fade label mb-4 flex flex-wrap items-center gap-3">
           <span class="h-px w-8 bg-accent" aria-hidden="true" />
           <span class="text-warm">{{ greeting.text }}</span>
           <span class="text-line" aria-hidden="true">·</span>
           The digital identity of
         </p>
 
-        <h1 id="hero-title" class="hero-name display-caps text-[clamp(2.9rem,6vw,6.25rem)] [text-shadow:0_2px_30px_rgb(0_0_0/0.45)]">
+        <h1 id="hero-title" class="hero-name display-caps text-[clamp(2.9rem,6vw,6.25rem)] leading-[0.9] tracking-[-0.018em] [text-shadow:0_2px_30px_rgb(0_0_0/0.45)]">
           Pavan<br />
           <em class="text-accent-ink [text-shadow:0_0_36px_rgb(var(--c-accent)/0.45)]">Ramshetty</em>
         </h1>
 
-        <p class="hero-fade mt-6 text-lg font-semibold tracking-tight sm:text-xl">
+        <p class="hero-fade mt-5 text-lg font-semibold tracking-tight sm:text-xl">
           {{ site.title }}
           <span class="mx-2 font-normal text-line" aria-hidden="true">/</span>
           <span class="font-medium text-muted">{{ site.subtitle }}</span>
         </p>
-        <p class="hero-fade mt-3 max-w-2xl font-display text-2xl italic text-ink/80 sm:text-[1.75rem]">
+        <p class="hero-fade mt-2 max-w-2xl font-display text-2xl italic leading-snug text-ink/85 sm:text-[1.7rem]">
           Building Digital Experiences with Frontend Engineering and AI.
         </p>
 
-        <p class="hero-fade mt-5 max-w-xl text-pretty text-base leading-relaxed text-ink/75 sm:text-[1.0625rem]">
+        <p class="hero-fade mt-4 max-w-[34rem] text-pretty text-[0.95rem] leading-[1.65] text-ink/75 sm:text-base">
           I build clean, responsive, accessible, and user-focused web experiences. Combining frontend engineering
           with AI-assisted development to create better digital products.
         </p>
 
-        <div class="hero-fade mt-8 flex flex-wrap items-center gap-3">
+        <div class="hero-fade hero-ctas mt-7 flex flex-wrap items-center gap-3">
           <BaseButton v-if="hasVideo" cursor="Watch" @click="watchIntro">
             <Play class="h-4 w-4" fill="currentColor" aria-hidden="true" />
             Watch My Intro
@@ -222,7 +267,7 @@ onBeforeUnmount(() => {
           </BaseButton>
         </div>
 
-        <dl class="hero-fade mt-10 grid max-w-lg grid-cols-2 gap-6 border-t border-white/15 pt-5">
+        <dl class="hero-fade mt-9 grid max-w-lg grid-cols-2 gap-6 border-t border-white/15 pt-5">
           <div>
             <dt class="label">Experience</dt>
             <dd class="mt-2 font-display text-3xl">
@@ -255,6 +300,39 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+/* floating particles: slow vertical drift with a gentle sway and twinkle */
+.hero-particle {
+  opacity: 0;
+  animation-name: hero-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+@keyframes hero-float {
+  0% { transform: translate3d(0, 24px, 0); opacity: 0; }
+  20% { opacity: 1; }
+  50% { transform: translate3d(10px, -18px, 0); }
+  80% { opacity: 0.8; }
+  100% { transform: translate3d(-6px, -60px, 0); opacity: 0; }
+}
+/* simplified / reduced motion: particles stay as a still, faint starfield */
+:global(.motion-lite) .hero-particle,
+:global(.motion-reduced) .hero-particle {
+  opacity: 0.5;
+}
+
+/* hero CTAs: soft glow on hover/focus (magnetic movement still comes from BaseButton) */
+.hero-ctas :deep(> a),
+.hero-ctas :deep(> button) {
+  transition: box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), color 0.5s, background-color 0.5s, border-color 0.5s;
+}
+.hero-ctas :deep(> a:not(:last-child):hover),
+.hero-ctas :deep(> button:hover),
+.hero-ctas :deep(> a:not(:last-child):focus-visible),
+.hero-ctas :deep(> button:focus-visible) {
+  box-shadow: 0 14px 40px -14px rgb(var(--c-accent) / 0.75), 0 0 0 1px rgb(var(--c-accent) / 0.35);
+}
+
 .scroll-dot {
   animation: drip 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }

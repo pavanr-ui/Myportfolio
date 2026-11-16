@@ -114,8 +114,8 @@ onBeforeUnmount(() => {
         <li v-for="item in navItems" :key="item.id">
           <a
             :href="`#${item.id}`"
-            class="relative block px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-300"
-            :class="active === item.id || hovered === item.id ? 'text-ink' : 'text-muted'"
+            class="relative block rounded-full px-3 py-2 text-[0.8125rem] font-medium transition-[color,background-color] duration-300"
+            :class="active === item.id || hovered === item.id ? 'bg-ink/[0.07] text-ink' : 'text-ink/70'"
             :aria-current="active === item.id ? 'true' : undefined"
             @mouseenter="hovered = item.id"
             @focus="hovered = item.id"

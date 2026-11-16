@@ -33,6 +33,8 @@ export const site = {
    */
   avatarVideo: {
     src: '/media/avatar-intro.mp4',
+    /** Optional smaller WebM (VP9) — used first by browsers that support it. */
+    srcWebm: '/media/avatar-intro.webm',
     poster: '/media/avatar-poster.webp',
     captions: '/media/avatar-intro.vtt',
     width: 1280,

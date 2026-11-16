@@ -203,6 +203,7 @@ defineExpose({ watchIntro })
         @loadedmetadata="duration = video.duration"
         @ended="onEnded"
       >
+        <source v-if="cfg.srcWebm" :src="cfg.srcWebm" type="video/webm" />
         <source :src="cfg.src" type="video/mp4" />
         <track kind="captions" srclang="en" label="English" :src="cfg.captions" />
       </video>
@@ -328,13 +329,15 @@ defineExpose({ watchIntro })
 }
 /* full-bleed: keep face + body in view — avatar sits right of centre in the source frame */
 .avatar-cover {
-  object-position: 62% 22%;
+  object-position: 50% 20%;
+  /* gentle lift on top of the brightness already baked into the encode — keeps skin tones natural */
+  filter: brightness(1.08) contrast(1.04);
 }
 @media (max-width: 1023px) {
-  .avatar-cover { object-position: 58% 6%; }
+  .avatar-cover { object-position: 52% 6%; }
 }
 @media (max-width: 639px) {
-  .avatar-cover { object-position: 57% 4%; }
+  .avatar-cover { object-position: 52% 4%; }
 }
 video::cue {
   background: rgb(0 0 0 / 0.6);
