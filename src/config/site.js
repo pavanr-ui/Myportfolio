@@ -74,4 +74,9 @@ export const site = {
    * (or opens the visitor's mail app if `contact.email` is set).
    */
   formEndpoint: '',
+  /**
+   * Web3Forms access key (free — get one at https://web3forms.com with your email address).
+   * When set, form messages are delivered straight to that inbox. The key is designed to be public.
+   */
+  formAccessKey: '88ce6394-794e-4513-95dd-0219459d70eb',
 }

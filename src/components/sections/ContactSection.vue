@@ -33,9 +33,10 @@ async function copyEmail() {
 }
 
 /** endpoint → real submission · email only → opens mail app · neither → demo */
-const mode = computed(() => (site.formEndpoint ? 'live' : email ? 'mailto' : 'demo'))
+const mode = computed(() => (site.formAccessKey || site.formEndpoint ? 'live' : email ? 'mailto' : 'demo'))
 
 const form = reactive({ name: '', email: '', message: '' })
+const botcheck = ref(false) // honeypot: real visitors never see or tick it
 const errors = reactive({})
 const status = ref('idle') // idle | sending | sent | error
 const statusMsg = ref('')
@@ -58,12 +59,24 @@ async function submit() {
 
   try {
     if (mode.value === 'live') {
-      const res = await fetch(site.formEndpoint, {
+      const web3 = !!site.formAccessKey
+      const payload = web3
+        ? {
+            access_key: site.formAccessKey,
+            subject: `Portfolio enquiry from ${form.name}`,
+            from_name: 'Portfolio contact form',
+            replyto: form.email,
+            botcheck: botcheck.value,
+            ...form,
+          }
+        : form
+      const res = await fetch(web3 ? 'https://api.web3forms.com/submit' : site.formEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error(String(res.status))
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || (web3 && data.success === false)) throw new Error(String(res.status))
       statusMsg.value = 'Thank you — your message has been sent. I’ll be in touch soon.'
     } else if (mode.value === 'mailto') {
       const subject = encodeURIComponent(`Portfolio enquiry from ${form.name}`)
@@ -223,6 +236,8 @@ const floatLabel =
             </p>
             <span v-else id="form-mode" class="sr-only">Messages are sent directly.</span>
 
+            <!-- spam honeypot (hidden from people and assistive tech) -->
+            <input v-model="botcheck" type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <div class="grid gap-8 sm:grid-cols-2">
               <div class="relative">
                 <input
