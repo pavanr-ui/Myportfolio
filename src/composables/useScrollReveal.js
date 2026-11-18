@@ -33,7 +33,7 @@ export function useScrollReveal(rootRef, extra) {
 
     ctx = gsap.context(() => {
       const shown = { y: 0, autoAlpha: 1, clearProps: 'transform,opacity,visibility' }
-      const st = (trigger, start = 'top 86%') => ({ trigger, start, once: true })
+      const st = (trigger, start = 'top 94%') => ({ trigger, start, once: true })
 
       root.querySelectorAll('[data-split]').forEach((el) => {
         const chars = el.dataset.split === 'chars' && motion.full
@@ -45,8 +45,8 @@ export function useScrollReveal(rootRef, extra) {
         gsap.from(chars ? split.chars : split.lines, {
           yPercent: 115,
           rotate: chars ? 6 : 0,
-          duration: chars ? 1.1 : 1.25,
-          stagger: chars ? 0.014 : 0.09,
+          duration: chars ? 0.85 : 0.95,
+          stagger: chars ? 0.01 : 0.07,
           scrollTrigger: st(el),
         })
       })
@@ -60,23 +60,23 @@ export function useScrollReveal(rootRef, extra) {
             { clipPath: kind === 'mask' ? 'inset(100% 0% 0% 0%)' : 'inset(0% 100% 0% 0%)' },
             {
               clipPath: 'inset(0% 0% 0% 0%)',
-              duration: 1.4,
+              duration: 1.05,
               ease: 'expo.inOut',
               delay,
               clearProps: 'clipPath',
-              scrollTrigger: st(el, 'top 85%'),
+              scrollTrigger: st(el, 'top 94%'),
             },
           )
         } else {
-          gsap.fromTo(el, { y: 36, autoAlpha: 0 }, { ...shown, delay, scrollTrigger: st(el, 'top 88%') })
+          gsap.fromTo(el, { y: 36, autoAlpha: 0 }, { ...shown, duration: 0.8, delay, scrollTrigger: st(el, 'top 95%') })
         }
       })
 
       root.querySelectorAll('[data-stagger]').forEach((el) => {
         gsap.fromTo(
           el.children,
-          { y: 44, autoAlpha: 0 },
-          { ...shown, stagger: parseFloat(el.dataset.stagger || 0.1), scrollTrigger: st(el, 'top 85%') },
+          { y: 32, autoAlpha: 0 },
+          { ...shown, duration: 0.8, stagger: parseFloat(el.dataset.stagger || 0.1) * 0.75, scrollTrigger: st(el, 'top 94%') },
         )
       })
 

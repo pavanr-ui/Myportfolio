@@ -2,7 +2,7 @@
 /**
  * Cinematic opening: dark stage → drawing grid → name letter by letter → light sweep →
  * role lines → curtain wipe into the hero.
- * - Plays once per browser session (sessionStorage), never for reduced motion.
+ * - Plays on the first visit, then at most once a week (localStorage), never for reduced motion.
  * - "Skip intro" button and the Esc key jump straight to the hand-over.
  * - A safety timeout guarantees the page is never held behind the intro.
  */
@@ -13,7 +13,7 @@ import { site } from '@/config/site'
 const KEY = 'intro-seen'
 const seen = (() => {
   try {
-    return sessionStorage.getItem(KEY) === '1'
+    return Date.now() - Number(localStorage.getItem(KEY) || 0) < 7 * 864e5
   } catch {
     return false
   }
@@ -65,7 +65,7 @@ onMounted(async () => {
     return
   }
   try {
-    sessionStorage.setItem(KEY, '1')
+    localStorage.setItem(KEY, String(Date.now()))
   } catch {}
   appState.introPlayed = true
   document.documentElement.style.overflow = 'hidden'

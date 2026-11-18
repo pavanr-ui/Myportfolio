@@ -6,6 +6,8 @@
  *  - Moving floor grid fading into fog
  *  - Hero: holographic rings + floating technology labels around the avatar
  *  - Contact: a glowing knot that comes into view at the end of the page
+ *  - Section tint: particles + grid shift colour per section (setTint)
+ *  - Hover: floating objects grow and glow under the pointer (raycast, ~8 objects)
  *  - Pointer parallax on the camera
  *
  * Materials are unlit (MeshBasic / Line / Points with additive blending): no lights, no shadows.
@@ -37,6 +39,8 @@ import {
   SRGBColorSpace,
   Clock,
   MathUtils,
+  Raycaster,
+  Vector2,
 } from 'three'
 
 const CYAN = new Color('#22d3ee')
@@ -112,10 +116,10 @@ export function createScene(canvas, { mobile = false } = {}) {
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uPixel: { value: dpr } },
+    uniforms: { uTime: { value: 0 }, uPixel: { value: dpr }, uTint: { value: new Color(CYAN) }, uTintMix: { value: 0 } },
     vertexShader: /* glsl */ `
       attribute vec3 aColor; attribute float aSeed;
-      uniform float uTime; uniform float uPixel;
+      uniform float uTime; uniform float uPixel; uniform vec3 uTint; uniform float uTintMix;
       varying vec3 vColor; varying float vAlpha;
       void main() {
         vec3 p = position;
@@ -125,7 +129,7 @@ export function createScene(canvas, { mobile = false } = {}) {
         gl_Position = projectionMatrix * mv;
         float size = mix(1.4, 3.6, aSeed);
         gl_PointSize = size * uPixel * (14.0 / -mv.z);
-        vColor = aColor;
+        vColor = mix(aColor, uTint, uTintMix * (0.35 + 0.65 * aSeed));
         vAlpha = 0.35 + 0.45 * (0.5 + 0.5 * sin(uTime * 1.2 + aSeed * 60.0));
       }`,
     fragmentShader: /* glsl */ `
@@ -155,7 +159,7 @@ export function createScene(canvas, { mobile = false } = {}) {
     const g = new Group()
     g.add(wire, core)
     g.position.set(...s.at)
-    g.userData = { base: g.position.y, speed: 0.15 + Math.random() * 0.2, phase: Math.random() * 6 }
+    g.userData = { base: g.position.y, speed: 0.15 + Math.random() * 0.2, phase: Math.random() * 6, wire: wire.material, hover: 0, spin: 0 }
     scene.add(g)
     floaters.push(g)
   }
@@ -200,10 +204,20 @@ export function createScene(canvas, { mobile = false } = {}) {
   contact.add(new Mesh(knotGeo, new MeshBasicMaterial({ color: PURPLE, wireframe: true, transparent: true, opacity: 0.32, blending: AdditiveBlending, depthWrite: false })))
   contact.add(new Mesh(knotGeo, new MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0.07, blending: AdditiveBlending, depthWrite: false })))
   contact.position.set(6, -TRAVEL, -4)
+  contact.userData = { wire: contact.children[0].material, hover: 0, spin: 0 }
   scene.add(contact)
 
+  // ── hover: pointer raycast against the interactive objects ─
+  const raycaster = new Raycaster()
+  const ndc = new Vector2()
+  const hoverables = [...floaters, contact]
+
+  // ── section tint ───────────────────────────────────────────
+  const tint = { color: new Color(CYAN), mix: 0, targetColor: new Color(CYAN), targetMix: 0 }
+  const gridBase = new Color(1, 1, 1)
+
   // ── state & layout ─────────────────────────────────────────
-  const state = { scroll: 0, camY: 0, px: 0, py: 0, tx: 0, ty: 0, running: false, raf: 0, w: 1, h: 1, anchor: null }
+  const state = { pointer: false, scroll: 0, camY: 0, px: 0, py: 0, tx: 0, ty: 0, running: false, raf: 0, w: 1, h: 1, anchor: null }
   const HERO_Z = -1.5
 
   /** Convert a viewport rect (as measured at scroll 0) into the hero group's world position/scale. */
@@ -268,8 +282,38 @@ export function createScene(canvas, { mobile = false } = {}) {
       sp.material.opacity = heroFade
     })
 
-    contact.rotation.x = t * 0.18
-    contact.rotation.y = t * 0.24
+    contact.rotation.x = t * 0.18 + contact.userData.spin
+    contact.rotation.y = t * 0.24 + contact.userData.spin
+
+    // hover: grow + glow + spin a little faster under the pointer
+    let hit = null
+    if (state.pointer) {
+      ndc.set(state.tx * 2, -state.ty * 2)
+      raycaster.setFromCamera(ndc, camera)
+      const hits = raycaster.intersectObjects(hoverables.filter((o) => o.visible), true)
+      if (hits.length) {
+        hit = hits[0].object
+        while (hit && !hoverables.includes(hit)) hit = hit.parent
+      }
+    }
+    for (const o of hoverables) {
+      const u = o.userData
+      u.hover += ((o === hit ? 1 : 0) - u.hover) * 0.08
+      u.spin += u.hover * 0.03
+      o.scale.setScalar(1 + u.hover * 0.35)
+      u.wire.opacity = (u.wire.userData.base ??= u.wire.opacity) + u.hover * 0.4
+    }
+    if (state.hit !== !!hit) {
+      state.hit = !!hit
+      document.documentElement.classList.toggle('over-3d', state.hit)
+    }
+
+    // section tint (eased)
+    tint.color.lerp(tint.targetColor, 0.03)
+    tint.mix += (tint.targetMix - tint.mix) * 0.03
+    pMat.uniforms.uTint.value.copy(tint.color)
+    pMat.uniforms.uTintMix.value = tint.mix
+    grid.material.color.copy(gridBase).lerp(tint.color, tint.mix * 0.8)
 
     renderer.render(scene, camera)
     state.raf = requestAnimationFrame(frame)
@@ -286,8 +330,14 @@ export function createScene(canvas, { mobile = false } = {}) {
       state.scroll = MathUtils.clamp(p, 0, 1)
     },
     setPointer(nx, ny) {
+      state.pointer = true
       state.tx = nx
       state.ty = ny
+    },
+    /** Shift particle + grid colour toward `hex` by `amount` (0–1). */
+    setTint(hex, amount) {
+      tint.targetColor.set(hex)
+      tint.targetMix = amount
     },
     start() {
       if (state.running) return
@@ -309,6 +359,7 @@ export function createScene(canvas, { mobile = false } = {}) {
           m.dispose()
         })
       })
+      document.documentElement.classList.remove('over-3d')
       renderer.dispose()
       renderer.forceContextLoss()
     },

@@ -84,6 +84,15 @@ useScrollReveal(root, (el) => {
     ScrollTrigger.create({ ...ca, start: 'left 55%', end: 'right 55%', onToggle: (s) => s.isActive && (active.value = i) })
   })
 
+  // 3D depth: each card swings in from the right, faces you in the centre, and tilts away on the left
+  el.querySelectorAll('.pj-slide').forEach((slide) => {
+    gsap.set(slide, { transformPerspective: 1800, transformOrigin: '50% 50%' })
+    gsap
+      .timeline({ scrollTrigger: { containerAnimation: tween, trigger: slide, start: 'left right', end: 'right left', scrub: true } })
+      .fromTo(slide, { rotationY: -16, z: -160, autoAlpha: 0.55 }, { rotationY: 0, z: 0, autoAlpha: 1, ease: 'power2.out' })
+      .to(slide, { rotationY: 12, z: -120, autoAlpha: 0.6, ease: 'power2.in' })
+  })
+
   // keyboard users: bring a focused panel into view by scrolling to its position on the track
   const onFocus = (e) => {
     const panel = e.target.closest('.pj-slide')

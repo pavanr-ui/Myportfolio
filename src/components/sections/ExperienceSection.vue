@@ -55,7 +55,10 @@ useScrollReveal(root, (el) => {
         <span class="absolute bottom-0 left-0 top-2 w-px sm:left-[13.5rem]" aria-hidden="true">
           <span
             class="tl-head absolute left-0 top-full h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_0_6px_rgb(var(--c-accent)/0.18),0_0_24px_4px_rgb(var(--c-accent)/0.45)] motion-reduced:hidden"
-          />
+          >
+            <!-- particle trail: sparks drift up and fade behind the travelling head -->
+            <i v-for="n in 6" :key="n" class="tl-spark css-loop" :style="{ '--i': n }" />
+          </span>
         </span>
 
         <li
@@ -137,3 +140,28 @@ useScrollReveal(root, (el) => {
     </div>
   </section>
 </template>
+
+<style scoped>
+.tl-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 9999px;
+  background: rgb(var(--c-cyan));
+  box-shadow: 0 0 8px rgb(var(--c-cyan) / 0.9);
+  opacity: 0;
+  animation: tl-spark 1.8s ease-out infinite;
+  animation-delay: calc(var(--i) * -0.3s);
+}
+.tl-spark:nth-child(even) {
+  background: rgb(var(--c-warm));
+  box-shadow: 0 0 8px rgb(var(--c-warm) / 0.9);
+}
+@keyframes tl-spark {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+  100% { transform: translate(calc((var(--i) - 3.5) * 5px), -46px) scale(0.2); opacity: 0; }
+}
+</style>

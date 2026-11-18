@@ -110,12 +110,12 @@ onBeforeUnmount(() => {
         <span class="hidden text-sm font-semibold tracking-wide sm:inline">{{ site.name }}</span>
       </a>
 
-      <ul ref="linkList" class="relative hidden items-center gap-1 lg:flex" @mouseleave="hovered = null">
+      <ul ref="linkList" class="relative isolate hidden items-center gap-1 lg:flex" @mouseleave="hovered = null">
         <li v-for="item in navItems" :key="item.id">
           <a
             :href="`#${item.id}`"
             class="relative block rounded-full px-3 py-2 text-[0.8125rem] font-medium transition-[color,background-color] duration-300"
-            :class="active === item.id || hovered === item.id ? 'bg-ink/[0.07] text-ink' : 'text-ink/70'"
+            :class="active === item.id || hovered === item.id ? 'text-ink' : 'text-ink/70'"
             :aria-current="active === item.id ? 'true' : undefined"
             @mouseenter="hovered = item.id"
             @focus="hovered = item.id"
@@ -124,7 +124,12 @@ onBeforeUnmount(() => {
             {{ item.label }}
           </a>
         </li>
-        <!-- gliding indicator -->
+        <!-- gliding pill + underline: one shared position, so they always move together -->
+        <span
+          class="pointer-events-none absolute left-0 top-0 -z-10 h-full rounded-full bg-ink/[0.07] transition-[transform,width,opacity] duration-500 ease-expo"
+          :style="{ width: indicator.w + 24 + 'px', transform: `translateX(${indicator.x - 12}px)`, opacity: indicator.show ? 1 : 0 }"
+          aria-hidden="true"
+        />
         <span
           class="pointer-events-none absolute -bottom-0.5 left-0 h-px bg-ink transition-[transform,width,opacity] duration-500 ease-expo"
           :class="hovered && hovered !== active ? 'opacity-50' : 'opacity-100'"

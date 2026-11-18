@@ -63,6 +63,28 @@ async function boot() {
   }
   const onPointer = (e) => api.setPointer(e.clientX / window.innerWidth - 0.5, e.clientY / window.innerHeight - 0.5)
 
+  // each section gives the scene its own colour mood
+  const tints = {
+    home: ['#22d3ee', 0],
+    about: ['#3b82f6', 0.55],
+    experience: ['#22d3ee', 0.5],
+    skills: ['#38bdf8', 0.6],
+    projects: ['#6366f1', 0.5],
+    'ai-journey': ['#a855f7', 0.7],
+    philosophy: ['#3b82f6', 0.4],
+    contact: ['#22d3ee', 0.6],
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const t = e.isIntersecting && tints[e.target.id]
+        if (t) api.setTint(t[0], t[1])
+      }
+    },
+    { rootMargin: '-45% 0px -45% 0px' },
+  )
+  document.querySelectorAll('main section[id]').forEach((s) => io.observe(s))
+
   onResize()
   onScroll()
   const settle = setTimeout(anchor, 2000) // after the hero entrance (the avatar scales in) has finished
@@ -72,6 +94,7 @@ async function boot() {
   document.addEventListener('visibilitychange', sync)
   cleanup = () => {
     clearTimeout(settle)
+    io.disconnect()
     window.removeEventListener('resize', onResize)
     window.removeEventListener('scroll', onScroll)
     window.removeEventListener('pointermove', onPointer)

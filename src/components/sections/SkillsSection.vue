@@ -15,11 +15,28 @@ import SkillGlyph from '../SkillGlyph.vue'
 import TiltCard from '../ui/TiltCard.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { skills, skillCategories } from '@/data/content'
+import { motion } from '@/composables/motion'
 
 // The orbital map is loaded lazily and only on tablet/desktop widths;
 // phones get the readable category cards below.
 const showOrbit = window.matchMedia('(min-width: 768px)').matches
-const SkillsOrbit = showOrbit ? defineAsyncComponent(() => import('../SkillsOrbit.vue')) : null
+// Full motion + WebGL → the interactive 3D sphere; otherwise the lighter CSS orbit.
+const webgl = (() => {
+  try {
+    return !!document.createElement('canvas').getContext('webgl2')
+  } catch {
+    return false
+  }
+})()
+const use3D = showOrbit && motion.full && webgl && !navigator.connection?.saveData
+const SkillsOrbit = showOrbit
+  ? defineAsyncComponent(() => (use3D ? import('../SkillsSphere.vue') : import('../SkillsOrbit.vue')))
+  : null
+const switcher = ref(null)
+function pick(cat) {
+  filter.value = cat
+  switcher.value?.scrollIntoView({ behavior: motion.animate ? 'smooth' : 'auto', block: 'start' })
+}
 
 const icons = { MessageSquareText, Sparkles, SquareTerminal, Code2, MonitorSmartphone, Accessibility, Layers, Wand2 }
 
@@ -52,11 +69,11 @@ useScrollReveal(root)
 
       <!-- interactive orbital map (tablet / desktop) -->
       <div v-if="SkillsOrbit" class="mb-28 min-h-[30rem]" data-reveal>
-        <component :is="SkillsOrbit" />
+        <component :is="SkillsOrbit" @select="pick" />
       </div>
 
       <!-- category switcher -->
-      <div class="mb-12 flex flex-wrap gap-2" role="group" aria-label="Show skill category" data-reveal>
+      <div ref="switcher" class="mb-12 flex scroll-mt-28 flex-wrap gap-2" role="group" aria-label="Show skill category" data-reveal>
         <button
           v-for="f in filters"
           :key="f.id"

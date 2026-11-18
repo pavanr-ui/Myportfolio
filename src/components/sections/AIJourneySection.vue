@@ -16,6 +16,23 @@ const root = ref(null)
 const story = motion.animate && window.matchMedia('(min-width: 1024px)').matches
 const step = ref(story ? 0 : -1)
 
+// Neural-network backdrop for the workflow story: 4 layers of nodes (prompt → model → review → code),
+// deterministic positions, links between neighbouring layers. Signals travel along the links (CSS).
+const net = (() => {
+  const cols = [3, 5, 5, 3]
+  const nodes = cols.flatMap((n, c) =>
+    Array.from({ length: n }, (_, r) => ({ id: `${c}-${r}`, c, x: 90 + c * 273, y: 300 / (n + 1) * (r + 1) + (c % 2 ? 0 : 6) })),
+  )
+  const links = []
+  nodes.forEach((a) =>
+    nodes.forEach((b) => {
+      if (b.c === a.c + 1 && (a.id.length + b.id.length + Number(a.id.slice(2)) * 3 + Number(b.id.slice(2))) % 3 !== 0)
+        links.push({ a, b, d: `M${a.x} ${a.y} C ${a.x + 120} ${a.y}, ${b.x - 120} ${b.y}, ${b.x} ${b.y}`, k: links.length })
+    }),
+  )
+  return { nodes, links }
+})()
+
 // Spotlight that follows the pointer inside each tool card
 function spot(e) {
   const el = e.currentTarget
@@ -46,7 +63,7 @@ useScrollReveal(root, (el) => {
       aria-hidden="true"
     />
 
-    <div class="container-site relative pt-24 sm:pt-28 lg:pt-36">
+    <div class="container-site relative pt-20 sm:pt-24 lg:pt-28">
       <SectionHeading id="ai-title" index="05" label="AI Journey">
         Exploring what’s <em class="text-accent-ink">next</em>.
         <template #intro>
@@ -121,9 +138,51 @@ useScrollReveal(root, (el) => {
     </div>
 
     <!-- workflow story: sticky on desktop, scroll moves through the five steps -->
-    <div class="ai-story relative mt-20 lg:mt-10" :class="story ? 'h-[300vh]' : ''">
+    <div class="ai-story relative mt-20 lg:mt-10" :class="story ? 'h-[220vh]' : ''">
       <div :class="story ? 'sticky top-0 flex h-screen items-center' : 'pb-8'">
-        <div class="container-site grid w-full items-center gap-12 lg:grid-cols-12">
+        <!-- neural network backdrop: lights up further as the workflow advances -->
+        <svg
+          class="ai-net pointer-events-none absolute inset-x-0 top-1/2 -z-0 mx-auto h-[70%] w-full max-w-6xl -translate-y-1/2 motion-reduced:opacity-40"
+          viewBox="0 0 1000 300"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="ai-net-g" x1="0" x2="1">
+              <stop offset="0" stop-color="rgb(var(--c-cyan))" />
+              <stop offset="1" stop-color="rgb(var(--c-warm))" />
+            </linearGradient>
+          </defs>
+          <g
+            v-for="l in net.links"
+            :key="l.k"
+            class="transition-opacity duration-700"
+            :style="{ opacity: step === -1 || l.a.c <= step ? 1 : 0.25 }"
+          >
+            <path :d="l.d" fill="none" stroke="url(#ai-net-g)" stroke-opacity="0.16" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <path
+              :d="l.d"
+              class="ai-signal css-loop"
+              fill="none"
+              stroke="url(#ai-net-g)"
+              stroke-width="1.6"
+              vector-effect="non-scaling-stroke"
+              pathLength="100"
+              :style="{ animationDelay: `${(l.k * 0.37) % 3}s`, animationDuration: `${2.6 + (l.k % 4) * 0.5}s` }"
+            />
+          </g>
+          <circle
+            v-for="n in net.nodes"
+            :key="n.id"
+            :cx="n.x"
+            :cy="n.y"
+            r="3"
+            class="transition-[fill-opacity] duration-700"
+            fill="rgb(var(--c-cyan))"
+            :fill-opacity="step === -1 || n.c <= step ? 0.85 : 0.25"
+          />
+        </svg>
+        <div class="container-site relative grid w-full items-center gap-12 lg:grid-cols-12">
           <div class="lg:col-span-4">
             <p class="label mb-8" data-reveal>How I work with AI</p>
             <ol class="space-y-6" :data-stagger="story ? undefined : '0.1'">
@@ -147,7 +206,7 @@ useScrollReveal(root, (el) => {
       </div>
     </div>
 
-    <div class="container-site relative pb-24 sm:pb-28 lg:pb-36">
+    <div class="container-site relative pb-20 sm:pb-24 lg:pb-28">
       <p class="flex max-w-2xl items-start gap-3 border-t border-line pt-8 text-sm leading-relaxed text-muted" data-reveal>
         <ShieldCheck class="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" stroke-width="1.5" aria-hidden="true" />
         <span>
@@ -160,6 +219,23 @@ useScrollReveal(root, (el) => {
 </template>
 
 <style scoped>
+.ai-net {
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, #000 35%, transparent 75%);
+}
+.ai-signal {
+  stroke-dasharray: 6 94;
+  stroke-dashoffset: 100;
+  animation: ai-signal 3s linear infinite;
+}
+.motion-reduced .ai-signal,
+.motion-lite .ai-signal {
+  display: none;
+}
+@keyframes ai-signal {
+  to { stroke-dashoffset: 0; }
+}
 .ai-glow {
   background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 50%), rgb(var(--c-accent) / 0.16), transparent 60%);
 }

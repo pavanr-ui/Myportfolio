@@ -98,6 +98,11 @@ function setup(el) {
           r: gsap.quickTo(c, 'rotation', { duration: 0.6, ease: 'power3.out' }),
         }))
       : []
+    // holographic depth: the avatar video tilts a few degrees toward the pointer
+    const visual = q('.hero-visual')[0]
+    gsap.set(visual, { transformPerspective: 1400, transformOrigin: '50% 40%' })
+    const tiltX = gsap.quickTo(visual, 'rotationX', { duration: 1.6, ease: 'power3.out' })
+    const tiltY = gsap.quickTo(visual, 'rotationY', { duration: 1.6, ease: 'power3.out' })
     let raf = 0
     const shapeType = (e) => {
       raf = 0
@@ -118,6 +123,13 @@ function setup(el) {
         l.x(nx * l.d)
         l.y(ny * l.d)
       })
+      if (!watching.value) {
+        tiltY(nx * 5)
+        tiltX(-ny * 3.5)
+      } else {
+        tiltY(0)
+        tiltX(0)
+      }
       if (!raf && letters.length) raf = requestAnimationFrame(() => shapeType(e))
     }
     el.addEventListener('pointermove', move, { passive: true })
@@ -162,6 +174,17 @@ onBeforeUnmount(() => {
         <div v-else class="container-site flex h-full items-center justify-end">
           <div class="hidden w-[min(26rem,40vw)] lg:block"><ProfilePortrait /></div>
         </div>
+      </div>
+      <!-- hologram layer: scanlines + a slow scan bar + edge glow (hidden while the intro is being watched) -->
+      <div
+        v-if="hasVideo"
+        class="holo pointer-events-none absolute inset-0 transition-opacity duration-700 motion-reduced:hidden"
+        :class="watching ? 'opacity-0' : 'opacity-100'"
+        aria-hidden="true"
+      >
+        <div class="holo-lines absolute inset-0" />
+        <div class="holo-bar css-loop absolute inset-x-0 h-[22%]" />
+        <div class="holo-edge absolute inset-0" />
       </div>
     </div>
 
@@ -296,10 +319,100 @@ onBeforeUnmount(() => {
         <span class="scroll-dot css-loop absolute left-0 top-0 h-5 w-px bg-ink" />
       </span>
     </a>
+    <!-- holographic 3D emblem (CSS 3D, no WebGL): spinning "pr" coin inside three orbit rings -->
+    <div
+      class="holo-emblem pointer-events-none absolute bottom-[24%] right-[5%] z-10 hidden transition-opacity duration-700 lg:block"
+      :class="watching ? 'opacity-0' : 'opacity-100'"
+      data-depth="18"
+      aria-hidden="true"
+    >
+      <div class="emb-stage">
+        <i class="emb-ring css-loop" style="--r: 0" />
+        <i class="emb-ring css-loop" style="--r: 1" />
+        <i class="emb-ring css-loop" style="--r: 2" />
+        <div class="emb-coin css-loop">
+          <span class="emb-face">{{ site.initials.toLowerCase() }}</span>
+          <span class="emb-face emb-back">{{ site.initials.toLowerCase() }}</span>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <style scoped>
+.emb-stage {
+  position: relative;
+  width: 7.5rem;
+  height: 7.5rem;
+  perspective: 700px;
+  transform-style: preserve-3d;
+}
+.emb-coin {
+  position: absolute;
+  inset: 1.6rem;
+  transform-style: preserve-3d;
+  animation: emb-swing 6s ease-in-out infinite;
+}
+.emb-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: #e6fbff;
+  text-shadow: 0 0 14px rgb(34 211 238 / 0.9);
+  background: radial-gradient(circle at 35% 30%, rgb(34 211 238 / 0.25), rgb(10 18 40 / 0.75) 70%);
+  border: 1.5px solid rgb(34 211 238 / 0.7);
+  box-shadow: 0 0 22px rgb(34 211 238 / 0.35), inset 0 0 18px rgb(139 92 246 / 0.35);
+  backface-visibility: hidden;
+}
+.emb-back {
+  transform: rotateY(180deg);
+}
+.emb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px solid rgb(34 211 238 / 0.8);
+  box-shadow: 0 0 10px rgb(34 211 238 / 0.25);
+  animation: emb-orbit calc(9s + var(--r) * 3s) linear infinite;
+  animation-direction: alternate;
+}
+.emb-ring:nth-child(2) { border-color: rgb(167 139 250 / 0.85); inset: 0.5rem; }
+.emb-ring:nth-child(3) { border-color: rgb(96 165 250 / 0.8); inset: -0.6rem; }
+@keyframes emb-swing {
+  0%, 100% { transform: rotateY(-35deg) rotateX(8deg); }
+  50% { transform: rotateY(215deg) rotateX(-8deg); }
+}
+@keyframes emb-orbit {
+  from { transform: rotateX(calc(60deg + var(--r) * 25deg)) rotateY(calc(var(--r) * 40deg)) rotateZ(0deg); }
+  to { transform: rotateX(calc(60deg + var(--r) * 25deg)) rotateY(calc(var(--r) * 40deg)) rotateZ(360deg); }
+}
+
+.holo-lines {
+  background: repeating-linear-gradient(to bottom, rgb(34 211 238 / 0.05) 0 1px, transparent 1px 4px);
+  mix-blend-mode: screen;
+}
+.holo-bar {
+  top: -22%;
+  background: linear-gradient(to bottom, transparent, rgb(34 211 238 / 0.07) 70%, rgb(103 232 249 / 0.16) 98%, transparent);
+  mix-blend-mode: screen;
+  animation: holo-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.holo-edge {
+  box-shadow: inset 0 0 120px rgb(34 211 238 / 0.08), inset 0 0 40px rgb(139 92 246 / 0.06);
+}
+@keyframes holo-scan {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(560%); opacity: 0; }
+}
+
 /* floating particles: slow vertical drift with a gentle sway and twinkle */
 .hero-particle {
   opacity: 0;

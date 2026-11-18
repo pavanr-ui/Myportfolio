@@ -39,6 +39,8 @@ const form = reactive({ name: '', email: '', message: '' })
 const errors = reactive({})
 const status = ref('idle') // idle | sending | sent | error
 const statusMsg = ref('')
+// paper plane that flies off the Send button when a message goes out (decorative, full/lite motion only)
+const plane = ref(0)
 
 function validate() {
   errors.name = form.name.trim() ? '' : 'Please enter your name.'
@@ -73,6 +75,7 @@ async function submit() {
       statusMsg.value = 'Demo mode: the form works, but no message was sent — a form service is not configured yet.'
     }
     status.value = 'sent'
+    if (!document.documentElement.classList.contains('motion-reduced')) plane.value++
     if (mode.value !== 'mailto') Object.assign(form, { name: '', email: '', message: '' })
   } catch {
     status.value = 'error'
@@ -269,7 +272,21 @@ const floatLabel =
               </div>
             </div>
 
-            <div class="mt-10 flex flex-wrap items-center justify-between gap-6">
+            <div class="relative mt-10 flex flex-wrap items-center justify-between gap-6">
+              <svg
+                v-if="plane"
+                :key="plane"
+                class="paper-plane pointer-events-none absolute left-24 top-0 h-9 w-9 text-accent-ink"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M22 2 11 13" />
+                <path d="M22 2 15 22l-4-9-9-4 20-7Z" fill="currentColor" fill-opacity="0.15" />
+              </svg>
               <BaseButton type="submit" :disabled="status === 'sending'">
                 {{ status === 'sending' ? 'Sending…' : 'Send Message' }}
                 <Send class="h-4 w-4" aria-hidden="true" />
@@ -290,3 +307,16 @@ const floatLabel =
     </div>
   </section>
 </template>
+
+<style scoped>
+.paper-plane {
+  animation: plane-fly 1.6s cubic-bezier(0.55, 0, 0.3, 1) forwards;
+  filter: drop-shadow(0 0 10px rgb(var(--c-cyan) / 0.7));
+}
+@keyframes plane-fly {
+  0% { transform: translate(0, 0) rotate(0) scale(0.6); opacity: 0; }
+  12% { opacity: 1; transform: translate(10px, -6px) rotate(-6deg) scale(1); }
+  45% { transform: translate(120px, -40px) rotate(8deg) scale(1.05); }
+  100% { transform: translate(520px, -340px) rotate(-18deg) scale(0.4); opacity: 0; }
+}
+</style>

@@ -28,12 +28,12 @@ export function useTextReveal(elRef, { type = 'chars', scroll = true, delay = 0,
       tl = gsap.timeline({
         paused: !scroll,
         delay,
-        scrollTrigger: scroll ? { trigger: el, start: 'top 85%', once: true } : undefined,
+        scrollTrigger: scroll ? { trigger: el, start: 'top 94%', once: true } : undefined,
       })
       tl.from(targets, {
         yPercent: 115,
         rotate: effective === 'chars' ? 8 : 0,
-        duration: 1.2,
+        duration: 0.9,
         stagger: stagger ?? (effective === 'chars' ? 0.03 : 0.1),
       })
       if (pending) tl.play()

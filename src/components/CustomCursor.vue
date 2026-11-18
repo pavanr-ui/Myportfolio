@@ -102,7 +102,7 @@ onBeforeUnmount(() => cleanup?.())
     <!-- trailing ring -->
     <div ref="ring" class="invisible absolute left-0 top-0 opacity-0" :class="state === 'label' ? '' : 'mix-blend-difference'">
       <div
-        class="grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border transition-[width,height,background-color,border-color,opacity] duration-500 ease-expo"
+        class="cursor-ring-inner grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border transition-[width,height,background-color,border-color,opacity] duration-500 ease-expo"
         :class="{
           'h-9 w-9 border-white/50': state === 'default',
           'h-14 w-14 border-white bg-white/10': state === 'link',

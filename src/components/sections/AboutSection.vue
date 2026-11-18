@@ -70,7 +70,7 @@ useScrollReveal(root, (el) => {
       </div>
 
       <!-- sticky storytelling statement (desktop); normal flow on small screens -->
-      <div class="about-story relative lg:-mt-24 lg:h-[200vh]">
+      <div class="about-story relative lg:-mt-24 lg:h-[150vh]">
         <div class="lg:sticky lg:top-0 lg:flex lg:h-screen lg:items-center">
           <p class="about-statement display-caps max-w-6xl text-balance text-[clamp(2.4rem,6.2vw,6.25rem)] leading-[0.98]">
             I create digital experiences that feel <em class="text-accent-ink">simple</em>,
@@ -104,7 +104,7 @@ useScrollReveal(root, (el) => {
       </div>
 
       <!-- animated statistics (computed from real data) -->
-      <dl class="mt-20 grid grid-cols-2 gap-4 lg:mt-24 lg:grid-cols-4" data-stagger="0.08">
+      <dl class="mt-16 grid grid-cols-2 gap-4 lg:mt-20 lg:grid-cols-4" data-stagger="0.08">
         <div v-for="st in stats" :key="st.label" class="glass glow-border flex flex-col rounded-2xl px-6 py-7">
           <dt class="label order-2 mt-3 block text-[0.625rem]">{{ st.label }}</dt>
           <dd class="font-display text-5xl leading-none sm:text-6xl">
@@ -114,15 +114,15 @@ useScrollReveal(root, (el) => {
       </dl>
 
       <!-- three storytelling blocks on an animated timeline -->
-      <div class="about-tl relative mt-24 pl-8 lg:mt-36 lg:pl-14">
+      <div class="about-tl relative mt-20 pl-8 lg:mt-24 lg:pl-14">
         <span class="absolute bottom-0 left-[7px] top-0 w-px bg-line lg:left-[19px]" aria-hidden="true" />
         <span
           class="about-tl-fill absolute bottom-0 left-[7px] top-0 w-px origin-top bg-gradient-to-b from-cyan via-accent to-warm shadow-[0_0_12px_rgb(var(--c-accent)/0.6)] lg:left-[19px]"
           aria-hidden="true"
         />
-        <article v-for="b in aboutBlocks" :key="b.index" class="relative py-14 lg:py-20">
+        <article v-for="b in aboutBlocks" :key="b.index" class="relative py-10 lg:py-14">
           <span
-            class="absolute -left-8 top-[4.6rem] grid h-[15px] w-[15px] place-items-center rounded-full border-2 border-accent bg-bg shadow-[0_0_0_6px_rgb(var(--c-accent)/0.15)] lg:-left-14 lg:top-[6.1rem] lg:ml-3"
+            class="absolute -left-8 top-[3.6rem] grid h-[15px] w-[15px] place-items-center rounded-full border-2 border-accent bg-bg shadow-[0_0_0_6px_rgb(var(--c-accent)/0.15)] lg:-left-14 lg:top-[4.6rem] lg:ml-3"
             aria-hidden="true"
           />
           <div class="grid items-center gap-10 lg:grid-cols-12">
