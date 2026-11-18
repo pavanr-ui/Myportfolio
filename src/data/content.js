@@ -160,9 +160,73 @@ export const projects = [
     focus: ['Prompt engineering', 'Code generation & review', 'AI-powered workflows', 'Human verification'],
     tags: ['ChatGPT', 'Claude', 'Claude Code', 'GitHub Copilot'],
     visual: 'journey',
-    image: '',
-    url: '',
+    image: '/projects/ai-dev-journey.webp',
+    url: 'https://aidevjourney.ramshettypavan.workers.dev/dashboard',
     github: '',
+  },
+  {
+    id: 'student-portal',
+    contribution:
+      'Personal project: designed and built the portal interface, including a split-screen sign-in and role-based demo access, and deployed it on Cloudflare Workers.',
+    index: '06',
+    title: 'MeStar Student Portal',
+    description: 'A school portal for tracking student progress, with role-based demo accounts.',
+    details:
+      'A student portal for a demo school, MeStar Academy. The sign-in screen offers demo accounts for three roles — Admin, Teacher and Parent — so each view of the portal can be explored without a real account.',
+    focus: ['Role-based access (Admin, Teacher, Parent)', 'Split-screen sign-in experience', 'Dashboard for student progress'],
+    tags: ['Web app', 'Dashboard', 'Cloudflare Workers'],
+    visual: 'dashboard',
+    image: '/projects/student-portal.webp',
+    url: 'https://studentportal.ramshettypavan.workers.dev/login',
+    github: '',
+  },
+  {
+    id: 'smart-school',
+    contribution:
+      'Personal project: built and deployed with Emergent, an AI app builder — a practical exercise in AI-assisted development for a complete school website.',
+    index: '07',
+    title: 'BE10X Smart School',
+    description: 'A school website with admissions, facilities, an AI chat assistant and an admin dashboard.',
+    details:
+      'A website for a demo school, BE10X School: home page with admissions, achievements, facilities and contact sections, an AI chat assistant, and an entry point to an admin dashboard. The school, its figures and photos are sample content.',
+    focus: ['School website sections', 'AI chat assistant', 'Admin dashboard'],
+    tags: ['AI-assisted build', 'Emergent', 'Web app'],
+    visual: 'browser',
+    image: '/projects/smart-school.webp',
+    url: 'https://smartschool-58.emergent.host/',
+    github: '',
+  },
+  {
+    id: 'bujji-storyland',
+    contribution:
+      'Personal project: designed and built the website for my Telugu kids’ story channel, with an illustrated jungle scene and the channel’s characters, and deployed it on Cloudflare Workers.',
+    index: '08',
+    title: 'Bujji Storyland',
+    description: 'The website for my Telugu kids’ story channel — little stories, big smiles.',
+    details:
+      'Home of Bujji, the little blue elephant, and his jungle friends: cheerful Telugu stories about kindness, friendship and adventure. The site introduces the characters, lists the episodes and stories, and links to the channel.',
+    focus: ['Characters & episodes', 'Telugu + English content', 'Playful illustrated design'],
+    tags: ['Website', 'Telugu', 'Cloudflare Workers'],
+    visual: 'browser',
+    image: '/projects/bujji-storyland.webp',
+    url: 'https://bujjistoryland.ramshettypavan.workers.dev/',
+    github: '',
+  },
+  {
+    id: 'portfolio',
+    contribution:
+      'Built with AI-assisted development using Claude Code — I directed, reviewed and tested every change. The intro video avatar was generated with Google AI Studio and Google Flow.',
+    index: '09',
+    title: 'This Portfolio',
+    description: 'A cinematic, motion-driven portfolio with 3D, scroll animation and an AI avatar intro.',
+    details:
+      'The site you are on: a Vue 3 single-page portfolio with GSAP scroll animation, a lazy-loaded Three.js background and skills sphere, an AI-generated avatar video, reduced-motion support and pre-rendered content for link previews.',
+    focus: ['Scroll-driven motion', '3D with Three.js', 'Accessibility & reduced motion', 'Performance (lazy loading)'],
+    tags: ['Vue 3', 'Vite', 'Tailwind CSS', 'GSAP', 'Three.js'],
+    visual: 'browser',
+    image: '/projects/portfolio.webp',
+    url: 'https://myportfolio.ramshettypavan.workers.dev/',
+    github: 'https://github.com/pavanr-ui/Myportfolio',
   },
 ]
 

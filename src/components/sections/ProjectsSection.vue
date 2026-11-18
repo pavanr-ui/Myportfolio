@@ -124,8 +124,8 @@ useScrollReveal(root, (el) => {
             Selected <em class="text-accent-ink">projects</em> &amp; focus areas
           </h2>
           <p class="mt-6 max-w-md leading-relaxed text-muted" data-reveal>
-            The kinds of products I build day to day — from Vue.js applications and cross-platform apps to dashboards,
-            AI Assistant experiences and my own AI developer journey.
+            The kinds of products I build day to day — Vue.js applications, cross-platform apps, dashboards and AI
+            Assistant experiences — plus live personal projects you can open and try.
           </p>
           <p v-if="horizontal" class="mt-10 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.2em] text-muted" data-reveal>
             Scroll to explore <ArrowRight class="css-loop nudge h-4 w-4" aria-hidden="true" />
@@ -137,7 +137,7 @@ useScrollReveal(root, (el) => {
           v-for="(p, i) in projects"
           :key="p.id"
           class="pj-slide shrink-0"
-          :style="horizontal ? { width: p.featured ? 'min(78vw, calc((100svh - 16rem) * 2.7))' : 'min(48vw, calc((100svh - 28rem) * 1.6))' } : null"
+          :style="horizontal ? { width: p.featured ? 'min(78vw, calc((100svh - 16rem) * 2.7))' : 'min(48vw, max(24rem, calc((100svh - 28rem) * 1.6)))' } : null"
         >
           <ProjectCard :ref="(c) => (cards[i] = c)" :project="p" :total="projects.length" :stacked="!horizontal" @open="openProject" />
         </div>
@@ -145,7 +145,7 @@ useScrollReveal(root, (el) => {
         <!-- closing panel -->
         <div class="flex shrink-0 flex-col justify-center" :class="horizontal ? 'w-[24rem]' : ''" data-reveal>
           <p class="display-caps text-4xl">More case studies <em class="text-accent-ink">soon</em>.</p>
-          <p class="mt-4 max-w-sm text-muted">Detailed write-ups and screenshots are on the way. In the meantime, let’s talk.</p>
+          <p class="mt-4 max-w-sm text-muted">Detailed write-ups for my work projects are on the way. In the meantime, let’s talk.</p>
           <div class="mt-8">
             <BaseButton href="#contact" variant="outline">
               Let’s Connect <ArrowUpRight class="h-4 w-4" aria-hidden="true" />

@@ -52,6 +52,12 @@ defineExpose({ media })
         <span v-if="project.featured" class="rounded-full bg-warm px-3 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-bg">
           Featured
         </span>
+        <span
+          v-if="project.url"
+          class="flex items-center gap-1.5 rounded-full bg-bg/85 px-3 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-accent-ink backdrop-blur"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgb(52_211_153/0.9)]" aria-hidden="true" /> Live
+        </span>
       </span>
       <!-- glare that follows the pointer (fed by useTilt) -->
       <div
@@ -67,9 +73,13 @@ defineExpose({ media })
       </span>
     </div>
 
-    <div :class="wide ? 'grid gap-6' : 'mt-7 grid gap-5 md:grid-cols-[1fr_auto] md:items-end'">
+    <div
+      :class="wide ? 'grid gap-6' : stacked ? 'mt-7 grid gap-5 md:grid-cols-[1fr_auto] md:items-end' : 'mt-5 grid gap-4'"
+    >
       <div>
-        <h3 class="pj-title display-caps text-[clamp(2rem,3.6vw,3.25rem)]" :data-split="stacked ? 'chars' : undefined">
+        <h3
+          class="pj-title display-caps text-balance"
+          :class="wide ? 'text-[clamp(2rem,3.6vw,3.25rem)]' : 'text-[clamp(1.75rem,2.5vw,2.5rem)]'" :data-split="stacked ? 'chars' : undefined">
           {{ project.title }}
         </h3>
         <p class="pj-meta mt-3 max-w-xl leading-relaxed text-muted" :data-reveal="stacked ? '' : undefined">
@@ -78,13 +88,17 @@ defineExpose({ media })
         <p
           v-if="project.contribution"
           class="pj-meta mt-4 max-w-xl border-l-2 border-warm/70 pl-4 text-sm leading-relaxed"
-          :class="project.featured ? '' : 'line-clamp-3'"
+          :class="project.featured ? '' : stacked ? 'line-clamp-3' : 'line-clamp-2'"
           :data-reveal="stacked ? '' : undefined"
         >
           <span class="label mb-1 block text-warm">My contribution</span>
           {{ project.contribution }}
         </p>
-        <ul class="pj-meta mt-5 flex flex-wrap gap-2" aria-label="Technologies">
+        <ul
+          class="pj-meta mt-5 flex flex-wrap gap-2"
+          :class="stacked || wide ? '' : '[@media(max-height:760px)]:hidden'"
+          aria-label="Technologies"
+        >
           <li v-for="t in project.tags" :key="t" class="tag group-hover:border-ink/25">{{ t }}</li>
         </ul>
       </div>

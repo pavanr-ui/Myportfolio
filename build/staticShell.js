@@ -78,6 +78,7 @@ async function renderShell() {
         <p>${esc(p.description)}</p>
         ${p.contribution ? `<p><em>My contribution:</em> ${esc(p.contribution)}</p>` : ''}
         <p><small>${(p.tags || []).map(esc).join(' · ')}</small></p>
+        ${p.url ? `<p><a href="${esc(p.url)}" rel="noopener noreferrer">Visit live project</a></p>` : ''}
       </article>`,
     )
     .join('')
